@@ -87,6 +87,7 @@ public class QueueFragmentController {
             e.printStackTrace();
             logger.error("Error when parsing order date!", e.getMessage());
         }
+
         return simpleObjects;
     }
 
