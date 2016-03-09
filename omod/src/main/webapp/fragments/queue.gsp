@@ -43,9 +43,9 @@
 
             <% props.each {
               if(it == props.last()){
-                  def pageLinkEdit = ui.pageLink("registration", "editPatient");
+                  def pageLinkEdit = ui.pageLink("", "");
                       %>
-            row += '<td> <a title="Patient Revisit" href="${pageLinkEdit}?patientId=' +
+            row += '<td> <a title="Patient Revisit" href="?patientId=' +
                     item.patientIdentifier + '&revisit=true"><i class="icon-user-md small" ></i></a>';
 
             <% } else {%>

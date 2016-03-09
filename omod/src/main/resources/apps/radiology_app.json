@@ -1,0 +1,18 @@
+[
+  {
+    "id": "radiologyapp.radiologyapp",        // unique id for this app, unique across all apps, typically starts with your module id
+    "description": "App for viewing various reports",        // plain text or a message code (not displayed to end-users)
+    "extensions": [
+      {
+        "id": "radiologyapp.radiologyAppHomepageLink",
+        "extensionPointId": "org.openmrs.referenceapplication.homepageLink",
+        "type": "link",
+        "label": "Radiology",        // text or message code (this is shown to the user)
+        "url": "radiologyapp/main.page",        // clicking on the app icon goes to this link,
+        "order": 8,
+        "icon": "icon-tasks",        // see the uicommons style guide icons
+        "requiredPrivilege": "Access Radilogy"        // require this privilege to show the link
+      }
+    ]
+  }
+]
