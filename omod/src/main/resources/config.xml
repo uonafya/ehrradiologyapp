@@ -52,6 +52,10 @@
 	</mappingFiles>
 
 	<!-- Internationalization -->
+	<privilege>
+		<name>App: radiologyapp</name>
+		<description>Able to access radiologyapp</description>
+	</privilege>
 	<!-- All message codes should start with ${project.parent.artifactId}. -->
 	<messages>
 		<lang>en</lang>
