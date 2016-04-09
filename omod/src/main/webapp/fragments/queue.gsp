@@ -8,7 +8,24 @@
         var queueData = new QueueData();
         var radiologyQueueTable = jq('#radiology-queue-results-table');
         var radiologyQueueDataTable;
+        var details = { 'patientName' : 'Patient Name', 'startDate' : 'Start Date', 'testName' : 'Test Name' }; 
+        var testDetails = { details : ko.observable(details) };
+        var scheduleDate = jq("#reschedule-date-field");
+        var orderId = jq("#order");
+        rescheduleDialog = emr.setupConfirmationDialog({
+            selector: '#reschedule-form',
+            actions: {
+                confirm: function() {
+                    saveQueueSchedule();
+                    rescheduleDialog.close();
+                },
+                cancel: function() {
+                    rescheduleDialog.close();
+                }
+            }
+        });
         ko.applyBindings(queueData, jq("#radiology-queue-results")[0]);
+        ko.applyBindings(testDetails, jq("#reschedule-form")[0]);
 
         initializeDataTable();
 
@@ -58,6 +75,17 @@
           );
         })
 
+        jq('#radiology-queue-results-table').on('click', '.reschedule-link', function () {
+            var orderId = jq(this).data('orderId');
+            jq("#reschedule-form #order").val(orderId);
+            var details = ko.utils.arrayFirst(queueData.tests(), function(item) {
+                return item.orderId == orderId;
+            });
+            testDetails.details(details);
+            rescheduleDialog.show();
+        });
+
+
         function QueueData() {
             self = this;
             self.tests = ko.observableArray([]);
@@ -70,6 +98,25 @@
 
         function refreshDataTable() {
             initializeDataTable();
+        }
+
+        function saveQueueSchedule() {
+            jq.post('${ui.actionLink("radiologyapp", "queue", "rescheduleOrder")}',
+                { "orderId" : orderId.val(), "rescheduledDate" : moment(scheduleDate.val()).format('DD/MM/YYYY') },
+                function (data) {
+                    if (data.status === "fail") {
+                        jq().toastmessage('showErrorToast', data.error);
+                    } else {
+                        jq().toastmessage('showSuccessToast', data.message);
+                        var rescheduledTest = ko.utils.arrayFirst(queueData.tests(), function(item) {
+                            return item.orderId == orderId.val();
+                        });
+                        console.log(rescheduledTest);
+                        queueData.tests.remove(rescheduledTest);
+                    }
+                },
+                'json'
+            );
         }
 
         function initializeDataTable() {
@@ -151,4 +198,44 @@
             </tr>
         </tbody>
     </table>
+</div>
+
+<div id="reschedule-form" title="Reschedule" class="dialog">
+    <div class="dialog-header">
+      <i class="icon-repeat"></i>
+      <h3>Reschedule Tests</h3>
+    </div>
+    
+    <div class="dialog-content">
+        <form>
+            <p>
+                <div class="dialog-data">Patient Name:</div>
+                <div class="inline" data-bind="text: details().patientName"></div>
+            </p> 
+            
+            <p >
+                <div class="dialog-data">Test Name:</div>
+                <div class="inline" data-bind="text: details().testName"></div>
+            </p>
+            
+            
+            <p>
+                <div class="dialog-data">Test Date:</div>
+                <div class="inline" data-bind="text: details().startDate"></div>
+            </p>
+            
+            <p>
+                ${ui.includeFragment("uicommons", "field/datetimepicker", [id: 'reschedule-date', label: 'Reschedule To', formFieldName: 'rescheduleDate', useTime: false, defaultToday: true, startToday: true])}
+            </p>
+                    
+            
+            <input type="hidden" id="order" name="order" >
+
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </form>
+        
+        <span class="button confirm right"> Confirm </span>
+        <span class="button cancel"> Cancel </span>
+    </div>
 </div>

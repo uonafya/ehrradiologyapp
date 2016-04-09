@@ -78,9 +78,9 @@ public class QueueFragmentController {
 		Order order = Context.getOrderService().getOrder(orderId);
 		if (order != null) {
 			try {
-				RadiologyService rs = (RadiologyService) Context
+				RadiologyService radiologyService = (RadiologyService) Context
 						.getService(RadiologyService.class);
-				Integer acceptedTestId = rs.acceptTest(order);
+				Integer acceptedTestId = radiologyService.acceptTest(order);
 				return SimpleObject.create("status", "success",
 						"acceptedTestId", acceptedTestId);
 			} catch (Exception e) {
@@ -91,6 +91,29 @@ public class QueueFragmentController {
 		}
 		return SimpleObject.create("status", "fail", "message", "Order '"
 				+ orderId + "' not found.");
+	}
+	
+	public SimpleObject rescheduleOrder(
+			@RequestParam("orderId") Integer orderId,
+			@RequestParam("rescheduledDate") String rescheduledDateString
+			) {
+
+		@SuppressWarnings("deprecation")
+		Order order = Context.getOrderService().getOrder(orderId);
+		if (order != null) {
+			RadiologyService radiologyService = Context.getService(RadiologyService.class);
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+			Date rescheduledDate;
+			try {
+				rescheduledDate = dateFormatter.parse(rescheduledDateString);
+				String status = radiologyService.rescheduleTest(order, rescheduledDate);
+				return SimpleObject.create("status", status, "message", "Order has been rescheduled.");
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return SimpleObject.create("status", "fail", "message", "Invalid date: " + rescheduledDateString);
+			}
+		}
+		return SimpleObject.create("status", "fail", "message", "Order '" + orderId +"' not found.");
 	}
 
 }
