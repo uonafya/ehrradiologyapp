@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,10 @@ import java.util.Set;
 import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hospitalcore.RadiologyService;
-import org.openmrs.module.hospitalcore.concept.TestTree;
-import org.openmrs.module.hospitalcore.model.RadiologyDepartment;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
 import org.openmrs.module.hospitalcore.util.TestModel;
+import org.openmrs.module.radiologyapp.util.RadiologyAppUtil;
 import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
 import org.slf4j.Logger;
@@ -40,7 +38,7 @@ public class WorklistFragmentController {
 		Date acceptedDate = null;
 		try {
 			acceptedDate = dateFormatter.parse(acceptedDateString);
-			Map<Concept, Set<Concept>> allowedInvestigations = getAllowedInvestigations();
+			Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
 			Set<Concept> allowableTests = new HashSet<Concept>();
 			if (investigation != null) {
 				allowableTests = allowedInvestigations.get(investigation);
@@ -59,24 +57,6 @@ public class WorklistFragmentController {
 			logger.error("An error occured while parsing date '{}'", acceptedDateString, e);
 			return SimpleObject.create("status", "error");
 		}
-	}
-	
-	private Map<Concept, Set<Concept>> getAllowedInvestigations() {
-		RadiologyService rs = (RadiologyService) Context
-				.getService(RadiologyService.class);
-		RadiologyDepartment department = rs.getCurrentRadiologyDepartment();
-		Map<Concept, Set<Concept>> investigationTests = new HashMap<Concept, Set<Concept>>();
-		if (department != null) {
-			Set<Concept> investigations = department.getInvestigations();
-			for (Concept investigation : investigations) {
-				TestTree tree = new TestTree(investigation);
-				if (tree.getRootNode() != null) {
-					investigationTests.put(tree.getRootNode().getConcept(),
-							tree.getConceptSet());
-				}
-			}			
-		}
-		return investigationTests;
 	}
 
 }
