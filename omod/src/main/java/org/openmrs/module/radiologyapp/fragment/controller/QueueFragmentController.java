@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -46,7 +47,7 @@ public class QueueFragmentController {
         Concept investigation = Context.getConceptService().getConcept(investigationId);
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
         Date orderDate = null;
-        List<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
+        List<SimpleObject> testOrdersInQueue = new ArrayList<SimpleObject>();
         try {
             orderDate = dateFormatter.parse(orderDateString);
             Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
@@ -64,13 +65,32 @@ public class QueueFragmentController {
                     currentPage);
             List<TestModel> tests = RadiologyUtil.generateModelsFromOrders(
                     orders, allowedInvestigations);
-            simpleObjects = SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "testName", "orderId","status");
+            testOrdersInQueue = SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "testName", "orderId","status");
         } catch (ParseException e) {
             e.printStackTrace();
             logger.error("Error when parsing order date!", e.getMessage());
         }
-
-        return simpleObjects;
+        return testOrdersInQueue;
     }
+
+	public SimpleObject acceptOrder(@RequestParam("orderId") Integer orderId) {
+		@SuppressWarnings("deprecation")
+		Order order = Context.getOrderService().getOrder(orderId);
+		if (order != null) {
+			try {
+				RadiologyService rs = (RadiologyService) Context
+						.getService(RadiologyService.class);
+				Integer acceptedTestId = rs.acceptTest(order);
+				return SimpleObject.create("status", "success",
+						"acceptedTestId", acceptedTestId);
+			} catch (Exception e) {
+				logger.error("Error while accepting order {}", orderId, e);
+				return SimpleObject
+						.create("status", "fail", "message", e.getMessage());
+			}
+		}
+		return SimpleObject.create("status", "fail", "message", "Order '"
+				+ orderId + "' not found.");
+	}
 
 }

@@ -4,9 +4,8 @@
     ui.includeJavascript("radiologyapp", "ko-utils.js");
 %>
 <script>
-var queueData;
     jq(function () {
-        queueData = new QueueData();
+        var queueData = new QueueData();
         var radiologyQueueTable = jq('#radiology-queue-results-table');
         var radiologyQueueDataTable;
         ko.applyBindings(queueData, jq("#radiology-queue-results")[0]);
@@ -24,22 +23,53 @@ var queueData;
                 "investigation": investigation,
               }
             ).success(function (data) {
-                radiologyQueueDataTable.clear();
-                radiologyQueueDataTable.destroy();
+                destroyDataTable();
                 if (data.length === 0) {
                     jq().toastmessage('showNoticeToast', "No match found!");
                     queueData.tests([]);
                 } else {
                     queueData.tests(data);
                 }
-                initializeDataTable();
+                refreshDataTable();
             });
         });
 
+        jq('#radiology-queue-results-table').on('click', '.accept-link', function () {
+            var orderId = jq(this).data('orderId');
+            jq.post('${ui.actionLink("radiologyapp", "queue", "acceptOrder")}',
+              { 
+                'orderId' : orderId,
+              },
+              function (data) {
+                  if (data.status === "success") {
+                      destroyDataTable();
+                      var acceptedTest = ko.utils.arrayFirst(queueData.tests(), function(item) {
+                          return item.orderId == orderId.val();
+                      });
+                      queueData.tests.remove(acceptedTest);
+                      acceptedTest.status = "accepted";
+                      queueData.tests.push(acceptedTest);
+                      refreshDataTable();
+                  } else if (data.status === "fail") {
+                      jq().toastmessage('showErrorToast', data.message);
+                  }
+              },
+              'json'
+          );
+        })
 
         function QueueData() {
             self = this;
             self.tests = ko.observableArray([]);
+        }
+
+        function destroyDataTable() {
+            radiologyQueueDataTable.clear();
+            radiologyQueueDataTable.destroy();
+        }
+
+        function refreshDataTable() {
+            initializeDataTable();
         }
 
         function initializeDataTable() {
@@ -110,11 +140,11 @@ var queueData;
                     <center id="action-icons">
                         <span data-bind="if: status" class="accepted">Accepted</span>
                         <span data-bind="ifnot: status">
-                            <a title="Accept" data-bind="attr: { href: 'javascript:accept(' + orderId + ')' }" ><i class="icon-ok small"></i></a>
+                            <a title="Accept" class="accept-link" data-bind="attr: { 'data-order-id': orderId }" ><i class="icon-ok small"></i></a>
                         </span>
 
                         <span data-bind="ifnot: status"> 
-                            <a title="Reschedule" data-bind="attr: { href : 'javascript:reschedule(' + orderId + ')' }"><i class="icon-repeat small"></i></a>
+                            <a title="Reschedule" class="reschedule-link" data-bind="attr: { 'data-order-id' : orderId }"><i class="icon-repeat small"></i></a>
                         </span>
                     </center>
                 </td>

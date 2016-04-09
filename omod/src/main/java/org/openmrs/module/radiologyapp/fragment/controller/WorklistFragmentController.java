@@ -55,7 +55,7 @@ public class WorklistFragmentController {
 					SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "test.name", "investigation", "testId", "orderId", "sampleId", "status", "value"));
 		} catch (ParseException e) {
 			logger.error("An error occured while parsing date '{}'", acceptedDateString, e);
-			return SimpleObject.create("status", "error");
+			return SimpleObject.create("status", "fail");
 		}
 	}
 
