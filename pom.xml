@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>radiologyapp</artifactId>
-	<version>1.0</version>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>RadiologyApp Module</name>
 	<description>This is the module for the radiology department</description>
@@ -51,51 +51,55 @@
 			</dependency>
 			-->
 			
-						
 			<!-- Begin OpenMRS modules -->
-			
-						
+
 			<dependency>
-			
 				<groupId>org.openmrs.module</groupId>
-												
 				<artifactId>uiframework-api</artifactId>
-																								
 				<version>3.3.1</version>
-												
 				<scope>provided</scope>
-				
 			</dependency>
-						
+
 			<dependency>
-			
 				<groupId>org.openmrs.module</groupId>
-												
 				<artifactId>uilibrary-api</artifactId>
-																								
 				<version>2.0.4</version>
-												
 				<scope>provided</scope>
 				
 			</dependency>
-						
+
 			<dependency>
-			
 				<groupId>org.openmrs.module</groupId>
-												
 				<artifactId>hospitalcore-api</artifactId>
-																								
 				<version>1.5.1</version>
-												
 				<scope>provided</scope>
-				
 			</dependency>
-						
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>referenceapplication-omod</artifactId>
+				<version>1.0.1</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>appframework-api</artifactId>
+				<version>2.4</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>appui-omod</artifactId>
+				<version>1.4</version>
+				<scope>provided</scope>
+			</dependency>
+
 			<!-- End OpenMRS modules -->
-			
 
 			<!-- Begin OpenMRS core -->
-			
+
 			<dependency>
 				<groupId>org.openmrs.api</groupId>
 				<artifactId>openmrs-api</artifactId>
@@ -135,7 +139,7 @@
 				<type>pom</type>
 				<scope>test</scope>
 			</dependency>
-						
+
 			<!-- End OpenMRS core -->
 
 		</dependencies>

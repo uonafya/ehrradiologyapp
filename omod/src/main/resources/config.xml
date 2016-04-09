@@ -18,19 +18,21 @@
 	
 	<!-- Required Modules -->
 	<require_modules>
-																											
 		<require_module version="3.3.1">
 			org.openmrs.module.uiframework
 		</require_module>
-																											
+
 		<require_module version="2.0.4">
 			org.openmrs.module.uilibrary
 		</require_module>
-																											
+
 		<require_module version="1.5.1">
 			org.openmrs.module.hospitalcore
 		</require_module>
-			
+
+		<require_module version="1.0.1">
+			org.openmrs.module.referenceapplication
+		</require_module>
 	</require_modules>
 	<!-- / Required Modules -->
 	
