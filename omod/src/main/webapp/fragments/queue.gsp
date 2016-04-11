@@ -30,10 +30,10 @@
         initializeDataTable();
 
         jq("#get-ordered-tests").on("click", function () {
-            var orderDate = jq("#order-date-field").val();
-            var phrase = jq("#phrase").val();
-            var investigation = jq("#investigation").val();
-            jq.getJSON('${ui.actionLink("radiologyapp", "Queue", "searchQueue")}',
+            var orderDate = jq("#queue-order-date-field").val();
+            var phrase = jq("#queue-phrase").val();
+            var investigation = jq("#queue-investigation").val();
+            jq.getJSON('${ui.actionLink("radiologyapp", "queue", "searchQueue")}',
               {
                 "orderDate": moment(orderDate).format('DD/MM/YYYY'),
                 "phrase": phrase,
@@ -145,11 +145,11 @@
 <div>
     <form>
         <fieldset>
-            ${ui.includeFragment("uicommons", "field/datetimepicker", [id: 'order-date', label: 'Date Ordered', formFieldName: 'orderDate', useTime: false, defaultToday: true])}
-            <label for="phrase">Patient Identifier/Name</label>
-            <input id="phrase" type="text"/>
-            <label for="investigation">Investigation</label>
-            <select name="investigation" id="investigation">
+            ${ui.includeFragment("uicommons", "field/datetimepicker", [id: 'queue-order-date', label: 'Date Ordered', formFieldName: 'orderDate', useTime: false, defaultToday: true])}
+            <label for="queue-phrase">Patient Identifier/Name</label>
+            <input id="queue-phrase" type="text"/>
+            <label for="queue-investigation">Investigation</label>
+            <select name="queue-investigation" id="investigation">
                 <option value="0">ALL</option>
                 <% investigations.each { investigation -> %>
                 <option value="${investigation.id}">${investigation.name.name}</option>

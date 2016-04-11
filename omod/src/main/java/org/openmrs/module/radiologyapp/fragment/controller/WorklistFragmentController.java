@@ -26,8 +26,10 @@ public class WorklistFragmentController {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	public void controller() {}
+
 	public SimpleObject searchWorkList(
-			@RequestParam(value = "date") String acceptedDateString,
+			@RequestParam(value = "orderedDate") String acceptedDateString,
 			@RequestParam(value = "investigation") Integer investigationId,
 			@RequestParam(value = "phrase", required = false) String phrase,
 			UiUtils ui
@@ -52,7 +54,7 @@ public class WorklistFragmentController {
 			Collections.sort(tests);
 			return SimpleObject.create("status", "success",
 					"data",
-					SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "test.name", "investigation", "testId", "orderId", "sampleId", "status", "value"));
+					SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "testName", "investigation", "testId", "orderId", "status", "givenFormId", "notGivenFormId", "givenEncounterId", "notGivenEncounterId"));
 		} catch (ParseException e) {
 			logger.error("An error occured while parsing date '{}'", acceptedDateString, e);
 			return SimpleObject.create("status", "fail");
