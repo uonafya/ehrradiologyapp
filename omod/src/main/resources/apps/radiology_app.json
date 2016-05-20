@@ -11,7 +11,7 @@
         "url": "radiologyapp/main.page",        // clicking on the app icon goes to this link,
         "order": 8,
         "icon": "icon-tasks",        // see the uicommons style guide icons
-        "requiredPrivilege": "Access Radilogy"        // require this privilege to show the link
+        "requiredPrivilege": "Access Radiology"        // require this privilege to show the link
       }
     ]
   }
