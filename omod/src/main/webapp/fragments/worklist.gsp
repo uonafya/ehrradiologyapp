@@ -66,6 +66,23 @@
 			});
 		}
 	});
+
+	function getResultTemplate(testId) {
+		jq.getJSON('${ui.actionLink("radiologyapp", "radResults", "getResultTemp")}',
+				{ "testId" : testId }
+		).success(function(parameterOptions){
+					parameterOpts.parameterOptions.removeAll();
+					var details = ko.utils.arrayFirst(workList.items(), function(item) {
+						return item.testId == testId;
+					});
+					jq.each(parameterOptions, function(index, parameterOption) {
+						parameterOption['patientName'] = details.patientName;
+						parameterOption['testName'] = details.test.name;
+						parameterOption['startDate'] = details.startDate;
+						parameterOpts.parameterOptions.push(parameterOption);
+					});
+				});
+	}
 </script>
 
 <div>

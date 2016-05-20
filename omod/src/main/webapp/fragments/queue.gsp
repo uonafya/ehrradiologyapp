@@ -32,7 +32,7 @@
         jq("#get-ordered-tests").on("click", function () {
             var orderDate = jq("#queue-order-date-field").val();
             var phrase = jq("#queue-phrase").val();
-            var investigation = jq("#queue-investigation").val();
+            var investigation = jq("#investigation").val();
             jq.getJSON('${ui.actionLink("radiologyapp", "queue", "searchQueue")}',
               {
                 "orderDate": moment(orderDate).format('DD/MM/YYYY'),
@@ -148,7 +148,7 @@
             ${ui.includeFragment("uicommons", "field/datetimepicker", [id: 'queue-order-date', label: 'Date Ordered', formFieldName: 'orderDate', useTime: false, defaultToday: true])}
             <label for="queue-phrase">Patient Identifier/Name</label>
             <input id="queue-phrase" type="text"/>
-            <label for="queue-investigation">Investigation</label>
+            <label for="investigation">Investigation</label>
             <select name="queue-investigation" id="investigation">
                 <option value="0">ALL</option>
                 <% investigations.each { investigation -> %>
