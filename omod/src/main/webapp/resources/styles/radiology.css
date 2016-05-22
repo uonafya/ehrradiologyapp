@@ -1,0 +1,166 @@
+table{
+	margin-top: 5px!important;
+}
+
+table a{
+	cursor: pointer;
+}
+
+td a:hover{
+	text-decoration: none;
+	color: #00f;
+	animation-duration: 4s;
+}
+
+.toast-item {
+	background-color: #222!important;
+}
+
+.add-on{
+	color: #f26522;
+	cursor: pointer;
+}
+
+.name {
+	color: #f26522;
+}
+.new-patient-header .demographics {
+    float: none!important;
+    margin-top: 5px;
+}
+.new-patient-header .demographics h1 span {
+    font-size: 1.3em;
+}
+.filter{
+    margin-top: -3px;
+    padding-top: 5px;
+}
+.filter div{
+	display: inline-block;
+}
+
+.filter label{
+	padding-left: 5px
+}
+
+.filter #issueName{
+	padding-left: 30px;
+    width: 510px;
+	
+}
+.second-col{
+	width: 77%;
+}
+
+.footer{
+	height: 50px;	
+}
+
+#phrase {
+	padding-left: 30px;
+    width: 100%;
+}
+
+#main-div .show-icon {
+    background: rgba(0, 0, 0, 0) url("../images/radiology.png") no-repeat scroll 0 0 / 100% auto;
+    display: inline-block;
+    float: right;
+    height: 60px;
+    margin-bottom: -40px;
+    margin-right: 5px;
+    width: 60px;
+}
+
+input[type="text"], select {
+    border: 1px solid #aaa;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    height: 36px;
+    padding-left: 5px;
+}
+
+#refresh{
+	border: 1px none #88af28;
+	color: #fff !important;
+	float: right;
+	margin-right: -5px;
+	margin-top: 5px;
+}
+#refresh a i{
+	font-size: 12px;
+}
+#inline-tabs {
+    background: #f9f9f9 none repeat scroll 0 0;
+}
+#worklist-order-date label,
+#queue-order-date label,
+#results-order-date label{
+	display: none;
+}
+.paging_full_numbers .fg-button {
+	margin: 1px;
+}
+.paging_full_numbers {
+	width: 62% !important;
+}	
+.dataTables_info {
+	float: left;
+	width: 35%;
+}
+.fieldset {
+    border: 1px solid #eee;
+    margin-bottom: 5px;
+    padding: 5px 0 5px 10px;
+}
+.fieldset div{
+	display: inline-block;
+}
+#radiology-worklist-table th:first-child,
+#radiology-queue-results th:first-child{
+	width: 5px!important;
+}
+#radiology-worklist-table th:last-child,
+#radiology-queue-results th:last-child{
+	width: 75px!important;
+}
+#radiology-worklist-table th:nth-child(2){
+	width: 50px!important;
+}
+#radiology-queue-results th:nth-child(2){
+	width: 70px!important;
+}
+#radiology-worklist-table th:nth-child(5),
+#radiology-queue-results th:nth-child(5){
+	width: 70px!important;
+}
+#radiology-worklist-table th:nth-child(6),
+#radiology-queue-results th:nth-child(6){
+	width: 70px!important;
+}
+.DataTables_sort_wrapper{
+	margin: 0px;
+	padding: 0px;
+}
+.DataTables_sort_wrapper span{
+	display:none;
+}
+.dialog-content label {
+    display: inline-block;
+    width: 130px !important;
+}
+.dialog-content input[type="text"], .dialog-content select {
+    display: inline-block !important;
+    width: 255px !important;
+}
+.dialog .add-on {
+    color: #f26522;
+    float: right;
+    left: auto;
+    margin-left: -33px;
+    margin-top: 5px;
+    position: absolute;
+}
+.dialog .dialog-content li {
+    margin-bottom: 2px!important;
+}
