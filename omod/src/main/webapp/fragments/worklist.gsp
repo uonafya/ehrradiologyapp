@@ -154,4 +154,22 @@
 			</tr>
 		</tbody>
 	</table>
+	
+</div>
+<div style="border-top: 1px solid #eee; height: 40px; padding: 5px 11px 0 5px;">
+	<label for="include-result">
+		<input id="include-result" type="checkbox">
+		Include result
+	</label>
+	
+	<span class="button task right">
+		<i class="icon-print small"></i>
+		Print
+	</span>
+	
+	<span class="button cancel right" style="margin-right: 5px;">
+		<i class="icon-print small"></i>
+		Export
+	</span>
+
 </div>

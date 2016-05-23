@@ -138,6 +138,9 @@ input[type="text"], select {
 #radiology-queue-results th:nth-child(6){
 	width: 70px!important;
 }
+.dataTables_wrapper {
+    min-height: 30px!important;
+}
 .DataTables_sort_wrapper{
 	margin: 0px;
 	padding: 0px;
