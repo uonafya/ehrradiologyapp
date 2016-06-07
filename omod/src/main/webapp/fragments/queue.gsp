@@ -18,6 +18,10 @@
 		var testDetails = { details : ko.observable(details) };
 		
         var rescheduleDialog = emr.setupConfirmationDialog({
+			dialogOpts: {
+				overlayClose: false,
+				close: true
+			},
             selector: '#reschedule-form',
             actions: {
                 confirm: function() {

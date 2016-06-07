@@ -43,7 +43,9 @@
 			destroyWorklistDataTable();
 			
 			if (worklist.data.length === 0) {
-				jq().toastmessage('showNoticeToast', "No match found!");
+				if (showNotification){
+					jq().toastmessage('showNoticeToast', "No match found!");				
+				}
 				worklistData.worklistItems([]);
 			} else {
 				worklistData.worklistItems(worklist.data);
