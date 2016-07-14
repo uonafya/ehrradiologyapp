@@ -1,14 +1,5 @@
 package org.openmrs.module.radiologyapp.fragment.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hospitalcore.RadiologyService;
@@ -21,6 +12,10 @@ import org.openmrs.ui.framework.UiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class WorklistFragmentController {
 
@@ -54,7 +49,8 @@ public class WorklistFragmentController {
 			Collections.sort(tests);
 			return SimpleObject.create("status", "success",
 					"data",
-					SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "testName", "investigation", "testId", "orderId", "status", "givenFormId", "notGivenFormId", "givenEncounterId", "notGivenEncounterId"));
+					SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender",
+							"age", "testName", "investigation", "testId", "orderId", "status", "givenFormId", "notGivenFormId", "givenEncounterId", "notGivenEncounterId","xray"));
 		} catch (ParseException e) {
 			logger.error("An error occured while parsing date '{}'", acceptedDateString, e);
 			return SimpleObject.create("status", "fail");

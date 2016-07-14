@@ -1,10 +1,11 @@
 <script>
     var radiologyWorklistTable = jq('#radiology-worklist-table');
     var radiologyWorklistDataTable;
-    var worklistData,reorderDialog,reorderForm;
+    var worklistData, reorderDialog, reorderForm, resultsDialog;
     var orderIdd;
-    var details = { 'patientName' : 'Patient Name', 'startDate' : 'Start Date', 'test' : { 'name' : 'Test Name' } };
-    var scanDetails = { details : ko.observable(details) }
+    var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
+    var scanDetails = {details: ko.observable(details)};
+    var resultDetails = {details: ko.observable(details)};
     jq(function () {
         radiologyWorklistTable = jq('#radiology-worklist-table');
         worklistData = new WorklistData();
@@ -33,22 +34,42 @@
             },
             selector: '#reorder-form',
             actions: {
-                confirm: function() {
+                confirm: function () {
                     saveSchedule();
                     reorderDialog.close();
                 },
-                cancel: function() {
+                cancel: function () {
                     reorderDialog.close();
                 }
             }
         });
-        reorderForm = jq("#reorder-form").find( "form" ).on( "submit", function( event ) {
+        resultsDialog = emr.setupConfirmationDialog({
+            dialogOpts: {
+                overlayClose: false,
+                close: true
+            },
+            selector: '#results-form',
+            actions: {
+                confirm: function () {
+                    saveResults();
+                    resultsDialog.close();
+                },
+                cancel: function () {
+                    resultsDialog.close();
+                }
+            }
+        });
+
+
+        reorderForm = jq("#reorder-form").find("form").on("submit", function (event) {
             event.preventDefault();
             saveSchedule();
         });
         ko.applyBindings(scanDetails, jq("#reorder-form")[0]);
+        ko.applyBindings(resultDetails, jq("#results-form")[0]);
         ko.applyBindings(worklistData, jq("#radiology-worklist")[0]);
     });//End of Document Ready
+
 
     function getWorklistData(showNotification) {
         if (typeof showNotification == 'undefined') {
@@ -109,13 +130,17 @@
         radiologyWorklistDataTable.destroy();
     }
     function showResultForm(testDetail) {
-        alert("about to edit" + testDetail);
+        resultDetails.details(testDetail);
+        orderIdd=testDetail.orderId;
+        resultsDialog.show();
+
+
     }
 
     function reorder(orderId) {
         jq("#reorder-form #order").val(orderId);
         orderIdd = orderId;
-        var details = ko.utils.arrayFirst(worklistData.worklistItems(), function(item) {
+        var details = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
             return item.orderId == orderId;
         });
         scanDetails.details(details);
@@ -124,38 +149,62 @@
 
     function saveSchedule() {
         jq.post('${ui.actionLink("radiologyapp", "queue", "rescheduleOrder")}',
-                { "orderId" : orderIdd, "rescheduledDate" : moment(jq("#reorder-date-field").val()).format('DD/MM/YYYY') },
+                {"orderId": orderIdd, "rescheduledDate": moment(jq("#reorder-date-field").val()).format('DD/MM/YYYY')},
                 function (data) {
                     if (data.status === "fail") {
                         jq().toastmessage('showErrorToast', data.error);
                     } else {
                         jq().toastmessage('showSuccessToast', data.message);
-                        var reorderedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function(item) {
+                        var reorderedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
                             return item.orderId == orderIdd;
                         });
                         worklistData.worklistItems.remove(reorderedTest);
                     }
                 },
                 'json'
+        )
+    }
+    ;
+    function saveResults() {
+        jq.post('${ui.actionLink("radiologyapp", "radiationResults", "saveScanResults")}',
+                {
+                    "orderId": orderIdd,
+                    "filmGiven": jq("#filmSelect").val(),
+                    "note": jq("#note").val(),
+                    "filmSize": jq("#filmSize").val()
+
+                },
+                function (data) {
+                    if (data.status === "fail") {
+                        jq().toastmessage('showErrorToast', data.error);
+                    } else {
+                        jq().toastmessage('showSuccessToast', data.message);
+                            var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+                                return item.orderId == orderIdd;
+                            });
+                            worklistData.worklistItems.remove(resultedTest);
+                    }
+                },
+                'json'
         );
     }
 
-   /* function getResultTemplate(testId) {
-        jq.getJSON('${ui.actionLink("radiologyapp", "radResults", "getResultTemp")}',
-                {"testId": testId}
-        ).success(function (parameterOptions) {
-                    parameterOpts.parameterOptions.removeAll();
-                    var details = ko.utils.arrayFirst(workList.items(), function (item) {
-                        return item.testId == testId;
-                    });
-                    jq.each(parameterOptions, function (index, parameterOption) {
-                        parameterOption['patientName'] = details.patientName;
-                        parameterOption['testName'] = details.test.name;
-                        parameterOption['startDate'] = details.startDate;
-                        parameterOpts.parameterOptions.push(parameterOption);
-                    });
-                });
-    }*/
+    /* function getResultTemplate(testId) {
+     jq.getJSON('${ui.actionLink("radiologyapp", "radiationResults", "getResultTemp")}',
+     {"testId": testId}
+     ).success(function (parameterOptions) {
+     parameterOpts.parameterOptions.removeAll();
+     var details = ko.utils.arrayFirst(workList.items(), function (item) {
+     return item.testId == testId;
+     });
+     jq.each(parameterOptions, function (index, parameterOption) {
+     parameterOption['patientName'] = details.patientName;
+     parameterOption['testName'] = details.test.name;
+     parameterOption['startDate'] = details.startDate;
+     parameterOpts.parameterOptions.push(parameterOption);
+     });
+     });
+     }*/
 </script>
 
 <div class="fieldset">
@@ -208,12 +257,7 @@
             <td data-bind="text: patientIdentifier"></td>
             <td data-bind="text: patientName"></td>
             <td data-bind="text: gender"></td>
-            <td>
-                <span data-bind="if: age < 1">< 1</span>
-                <!-- ko if: age > 1 -->
-                <span data-bind="text: age"></span>
-                <!-- /ko -->
-            </td>
+            <td data-bind="text: age"></td>
             <td data-bind="text: testName"></td>
             <td>
                 <a title="Enter Results" data-bind="click: showResultForm, attr: { href : '#' }"><i
@@ -268,6 +312,72 @@
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
         </form>
         <span class="button confirm right">Re-order</span>
+        <span class="button cancel">Cancel</span>
+    </div>
+</div>
+
+<div id="results-form" title="Enter Results" class="dialog">
+    <div class="dialog-header">
+        <i class="icon-share"></i>
+
+        <h3>Scan Results</h3>
+    </div>
+
+    <div class="dialog-content">
+        <form>
+            <p>
+
+            <div class="dialog-data">Patient Name:</div>
+
+            <div class="inline" data-bind="text: details().patientName"></div>
+        </p>
+            <p>
+
+            <div class="dialog-data">Test Date:</div>
+
+            <div class="inline" data-bind="text: details().startDate"></div>
+        </p>
+            <p>
+
+            <div class="dialog-data">Film Given:</div>
+            <div class="inline" >
+                <select id="filmSelect">
+                    <option value="0" selected>Please Select</option>
+                    <option value="Film Given">Film Given</option>
+                    <option value="Film Not Given">Film Not Given</option>
+                </select>
+
+            </div>
+        </p>
+            <p>
+
+            <div class="dialog-data">Scan Note</div>
+
+            <div  class="inline"> <input id="note" placeholder="Enter Scan Notes" required /> </div>
+        </p>
+
+
+            <p>
+
+            <div class="dialog-data">Film Size:</div>
+            <div class="inline" >
+                <select id="filmSize">
+                    <option value="sizena" selected>N/A</option>
+                    <option value="size1">8*10</option>
+                    <option value="size2">10*12</option>
+                    <option value="size3">12*15</option>
+
+                </select>
+
+            </div>
+        </p>
+
+
+
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </form>
+        <span class="button confirm right">Save</span>
         <span class="button cancel">Cancel</span>
     </div>
 </div>
