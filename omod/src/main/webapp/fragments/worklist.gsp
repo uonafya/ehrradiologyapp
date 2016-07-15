@@ -51,7 +51,8 @@
             selector: '#results-form',
             actions: {
                 confirm: function () {
-                    saveResults();
+//                    saveResults(); general radiology results
+                    saveXrayResults();//save xray results
                     resultsDialog.close();
                 },
                 cancel: function () {
@@ -165,18 +166,21 @@
         )
     }
     ;
-    function saveResults() {
-        jq.post('${ui.actionLink("radiologyapp", "radiationResults", "saveScanResults")}',
+    function saveXrayResults() {
+        var rTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+            return item.orderId == orderIdd;
+        });
+        jq.post('${ui.actionLink("radiologyapp", "radiationResults", "saveXrayResults")}',
                 {
-                    "orderId": orderIdd,
-                    "filmGiven": jq("#filmSelect").val(),
-                    "note": jq("#note").val(),
-                    "filmSize": jq("#filmSize").val()
+                    "testId": rTest.testId,
+                    "RADIOLOGY XRAY DEFAULT FORM REPORT STATUS": jq("#filmSelect").val(),
+                    "RADIOLOGY XRAY DEFAULT FORM NOTE": jq("#note").val(),
+                    "RADIOLOGY XRAY FILM SIZE TYPE": jq("#filmSize").val()
 
                 },
                 function (data) {
                     if (data.status === "fail") {
-                        jq().toastmessage('showErrorToast', data.error);
+                        jq().toastmessage('showErrorToast', data.message);
                     } else {
                         jq().toastmessage('showSuccessToast', data.message);
                             var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
@@ -343,8 +347,8 @@
             <div class="inline" >
                 <select id="filmSelect">
                     <option value="0" selected>Please Select</option>
-                    <option value="Film Given">Film Given</option>
-                    <option value="Film Not Given">Film Not Given</option>
+                    <option value="RADIOLOGY XRAY DEFAULT FORM FILM GIVEN">Film Given</option>
+                    <option value="RADIOLOGY XRAY DEFAULT FORM FILM NOT GIVEN">Film Not Given</option>
                 </select>
 
             </div>
@@ -362,10 +366,10 @@
             <div class="dialog-data">Film Size:</div>
             <div class="inline" >
                 <select id="filmSize">
-                    <option value="sizena" selected>N/A</option>
-                    <option value="size1">8*10</option>
-                    <option value="size2">10*12</option>
-                    <option value="size3">12*15</option>
+                    <option value="RADIOLOGY XRAY FILM SIZENA" selected>N/A</option>
+                    <option value="RADIOLOGY XRAY FILM SIZE1">8*10</option>
+                    <option value="RADIOLOGY XRAY FILM SIZE2">10*12</option>
+                    <option value="RADIOLOGY XRAY FILM SIZE3">12*15</option>
 
                 </select>
 
