@@ -3,6 +3,7 @@
     var radiologyWorklistDataTable;
     var worklistData, reorderDialog, reorderForm, resultsDialog;
     var orderIdd;
+    var isXray;
     var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
     var scanDetails = {details: ko.observable(details)};
     var resultDetails = {details: ko.observable(details)};
@@ -51,9 +52,13 @@
             selector: '#results-form',
             actions: {
                 confirm: function () {
-//                    saveResults(); general radiology results
-                    saveXrayResults();//save xray results
+                    if (isXray) {
+                        saveXrayResults();//save xray results
+                    } else {
+                        saveResults();//save other non-xray results
+                    }
                     resultsDialog.close();
+
                 },
                 cancel: function () {
                     resultsDialog.close();
@@ -132,7 +137,8 @@
     }
     function showResultForm(testDetail) {
         resultDetails.details(testDetail);
-        orderIdd=testDetail.orderId;
+        orderIdd = testDetail.orderId;
+        isXray = testDetail.xray;
         resultsDialog.show();
 
 
@@ -183,14 +189,41 @@
                         jq().toastmessage('showErrorToast', data.message);
                     } else {
                         jq().toastmessage('showSuccessToast', data.message);
-                            var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-                                return item.orderId == orderIdd;
-                            });
-                            worklistData.worklistItems.remove(resultedTest);
+                        var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+                            return item.orderId == orderIdd;
+                        });
+                        worklistData.worklistItems.remove(resultedTest);
                     }
                 },
                 'json'
         );
+    }
+    function saveResults() {
+        var rTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+            return item.orderId == orderIdd;
+        });
+        testId = rTest.testId;
+        var sString = 'Given';
+        jq.post('${ui.actionLink("radiologyapp", "radiationResults", "saveResults")}',
+                {
+                    "testId": testId,
+                    "type": sString
+                },
+                function (data) {
+                    if (data.status === "fail") {
+                        jq().toastmessage('showErrorToast', data.message);
+                    } else {
+                        jq().toastmessage('showSuccessToast', data.message);
+                        var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+                            return item.orderId == orderIdd;
+                        });
+                        worklistData.worklistItems.remove(resultedTest);
+                    }
+                },
+                'json'
+        );
+
+
     }
 
     /* function getResultTemplate(testId) {
@@ -344,7 +377,8 @@
             <p>
 
             <div class="dialog-data">Film Given:</div>
-            <div class="inline" >
+
+            <div class="inline">
                 <select id="filmSelect">
                     <option value="0" selected>Please Select</option>
                     <option value="RADIOLOGY XRAY DEFAULT FORM FILM GIVEN">Film Given</option>
@@ -357,14 +391,15 @@
 
             <div class="dialog-data">Scan Note</div>
 
-            <div  class="inline"> <input id="note" placeholder="Enter Scan Notes" required /> </div>
+            <div class="inline"><input id="note" placeholder="Enter Scan Notes" required/></div>
         </p>
 
 
             <p>
 
             <div class="dialog-data">Film Size:</div>
-            <div class="inline" >
+
+            <div class="inline">
                 <select id="filmSize">
                     <option value="RADIOLOGY XRAY FILM SIZENA" selected>N/A</option>
                     <option value="RADIOLOGY XRAY FILM SIZE1">8*10</option>

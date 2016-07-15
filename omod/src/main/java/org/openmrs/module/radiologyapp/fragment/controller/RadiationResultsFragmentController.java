@@ -10,6 +10,7 @@ import org.openmrs.module.hospitalcore.util.GlobalPropertyUtil;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
 import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
+import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,9 +60,58 @@ public class RadiationResultsFragmentController {
             }
             Context.getEncounterService().saveEncounter(enc);
             completeStatus = rs.completeTest(test);
-            return SimpleObject.create("status", "success", "message", "Saved Successfully", "completeStatus", completeStatus);
+            return SimpleObject.create("status", "success", "message", "Xray Results Saved Successfully", "completeStatus", completeStatus);
         }
-        return SimpleObject.create("status", "fail", "message", "Error Saving Results", "completeStatus", completeStatus);
+        return SimpleObject.create("status", "fail", "message", "Error Saving Xray Results", "completeStatus", completeStatus);
+    }
+
+
+    public SimpleObject saveResults(UiUtils uiUtils, @RequestParam(value = "testId") String testId,
+                                    @RequestParam(value = "type") String type,
+                                    HttpServletRequest request,PageModel model) {
+
+        RadiologyService rs = (RadiologyService) Context
+                .getService(RadiologyService.class);
+        RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
+        String encounterTypeStr = GlobalPropertyUtil.getString(
+                BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
+        EncounterType encounterType = Context.getEncounterService().getEncounterType(encounterTypeStr);
+        Encounter enc = new Encounter();
+        enc.setCreator(Context.getAuthenticatedUser());
+        enc.setDateCreated(new Date());
+        Location loc = Context.getLocationService().getLocation(1);
+        enc.setLocation(loc);
+        enc.setPatient(test.getPatient());
+        enc.setPatientId(test.getPatient().getId());
+        enc.setEncounterType(encounterType);
+        enc.setVoided(false);
+        enc.setProvider(Context.getAuthenticatedUser().getPerson());
+        enc.setUuid(UUID.randomUUID().toString());
+        enc.setEncounterDatetime(new Date());
+        enc = Context.getEncounterService().saveEncounter(enc);
+        Integer formId = null;
+        String completeStatus = "fail";
+        RadiologyForm form = test.getForm();
+        if (type.equalsIgnoreCase(RadiologyForm.GIVEN)) {
+            test.setEncounter(enc);
+            if (form != null)
+                formId = form.getId();
+        }
+        rs.saveRadiologyTest(test);
+//        RadiologyUtil.generateDataFromEncounter(null, enc, form);
+        Map<String, String> parameters = buildParameterList(request);
+        if (enc != null) {
+            for (String key : parameters.keySet()) {
+                Concept concept = RadiologyUtil.searchConcept(key);
+                Obs obs = insertValue(enc, concept, parameters.get(key), test);
+                if (obs.getId() == null)
+                    enc.addObs(obs);
+            }
+            Context.getEncounterService().saveEncounter(enc);
+            completeStatus = rs.completeTest(test);
+            return SimpleObject.create("status", "success", "message", "Scan Results Saved Successfully", "completeStatus", completeStatus);
+        }
+        return SimpleObject.create("status", "fail", "message", "Error Saving Scan Results", "completeStatus", completeStatus);
     }
 
 
