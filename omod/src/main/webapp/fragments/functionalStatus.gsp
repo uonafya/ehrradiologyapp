@@ -15,20 +15,23 @@
             } else {
                 serviceIds.push(jq(this).val());
             }
-            console.log(serviceIds)
         });
-
+		
+		jq('#filter-status').on('keyup',function(){
+			var searchPhrase = jq(this).val();
+            dataTable.search(searchPhrase).draw();
+		});
 
         dataTable=jQuery('#fTable').DataTable({
-            searching: false,
+            searching: true,
             lengthChange: false,
-            pageLength: 15,
+            pageLength: 25,
             jQueryUI: true,
             pagingType: 'full_numbers',
             sort: false,
             dom: 't<"fg-toolbar ui-toolbar ui-corner-bl ui-corner-br ui-helper-clearfix datatables-info-and-pg"ip>',
             language: {
-                zeroRecords: 'No Service Found',
+                zeroRecords: 'No Services Found',
                 paginate: {
                     first: 'First',
                     previous: 'Previous',
@@ -37,6 +40,12 @@
                 }
             }
         });
+		
+		dataTable.on( 'order.dt search.dt', function () {
+			dataTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+				cell.innerHTML = i+1;
+			} );
+		} ).draw();
 
         getBillableServices();
 
@@ -62,25 +71,22 @@
     });
 
     function getBillableServices() {
-        jQuery.ajax({
+        jq.ajax({
             type: "GET",
             url: "${ui.actionLink('radiologyapp','functionalStatus','getBillableServices')}",
             dataType: "json",
             success: function (data) {
                 billableServices = data
-                console.log(data);
 
                 var dataRows = [];
 
                 _.each(billableServices, function(billableService) {
                     var isChecked = (billableService.disable === true) ?"checked=checked":"";
-                    dataRows.push([billableService.name, '<input type="checkbox" class="service-status" '+ isChecked + '" value="'+ billableService.serviceId +'">'])
+                    dataRows.push([0, billableService.name, '<input type="checkbox" class="service-status" '+ isChecked + '" value="'+ billableService.serviceId +'">'])
                 });
-
 
                 dataTable.rows.add(dataRows);
                 dataTable.draw();
-
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert(xhr);
@@ -88,12 +94,34 @@
             }
         });
     }
-
 </script>
+
+<style>
+	.paging_full_numbers .fg-button {
+		margin: 1px;
+	}
+	.paging_full_numbers {
+		width: 62% !important;
+	}	
+	.dataTables_info {
+		float: left;
+		width: 35%;
+	}
+</style>
+
+<div class="fieldset">
+	<i class="icon-filter" style="color: rgb(91, 87, 166); float: left; font-size: 56px ! important; padding: 0px 10px 0px 0px;"></i>
+	<div style="margin-right: 30px; width: 88%;">
+		<label for="filter-status">Filter Functional Status</label><br/>
+		<input id="filter-status" type="text" placeholder="Filter Functional Status" style="width: 100%; padding-left: 30px;"/>
+		<i class="icon-search small" style="color: rgb(242, 101, 34); float: right; position: relative; margin-top: -32px; margin-right: 96.2%;"></i>
+	</div>
+</div>
 
 <table id='fTable'>
     <thead>
     <tr>
+        <th>#</th>
         <th>Test</th>
         <th>Disabled</th>
     </tr>

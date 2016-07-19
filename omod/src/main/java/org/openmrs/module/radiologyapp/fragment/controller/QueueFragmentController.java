@@ -48,7 +48,8 @@ public class QueueFragmentController {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
         Date orderDate = null;
         List<SimpleObject> testOrdersInQueue = new ArrayList<SimpleObject>();
-        try {
+
+		try {
             orderDate = dateFormatter.parse(orderDateString);
             Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
             Set<Concept> allowableTests = new HashSet<Concept>();
@@ -59,6 +60,7 @@ public class QueueFragmentController {
                     allowableTests.addAll(allowedInvestigations.get(c));
                 }
             }
+
             if (currentPage == null)
                 currentPage = 1;
             List<Order> orders = radiologyService.getOrders(orderDate, phrase, allowableTests,

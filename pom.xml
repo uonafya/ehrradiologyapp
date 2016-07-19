@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>radiologyapp</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>pom</packaging>
 	<name>RadiologyApp Module</name>
 	<description>This is the module for the radiology department</description>
@@ -12,7 +12,7 @@
 	
 	<developers>
 		<developer>
-			<name>Victor</name>
+			<name>Bespoke Devs</name>
 		</developer>
 	</developers>
 	
@@ -71,7 +71,7 @@
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>hospitalcore-api</artifactId>
-				<version>1.5.1</version>
+				<version>1.5.3</version>
 				<scope>provided</scope>
 			</dependency>
 
@@ -165,6 +165,17 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>external.atlassian.jgitflow</groupId>
+					<artifactId>jgitflow-maven-plugin</artifactId>
+					<version>1.0-m5</version>
+					<configuration>
+						<noDeploy>true</noDeploy>
+						<flowInitContext>
+							<developBranchName>qa</developBranchName>
+						</flowInitContext>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
