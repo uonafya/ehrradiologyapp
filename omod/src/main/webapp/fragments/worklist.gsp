@@ -2,12 +2,24 @@
     var radiologyWorklistTable = jq('#radiology-worklist-table');
     var radiologyWorklistDataTable;
     var worklistData, reorderDialog, reorderForm, resultsDialog;
-    var orderIdd;
-    var isXray;
+    var orderIdd, files;
+    var isXray, testId;
     var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
     var scanDetails = {details: ko.observable(details)};
     var resultDetails = {details: ko.observable(details)};
     jq(function () {
+
+        var options = {
+            target: '#resultsForm',
+            success: showSuccessResponse,
+            error: showErrorResponse,
+            clearForm: true,
+            dataType: 'json'
+        };
+
+        jq('#resultsForm').ajaxForm(options);
+
+
         radiologyWorklistTable = jq('#radiology-worklist-table');
         worklistData = new WorklistData();
 
@@ -22,6 +34,16 @@
             var searchPhrase = jq(this).val();
             radiologyWorklistDataTable.search(searchPhrase).draw();
         });
+
+
+        // Add events
+        jq('input[type=file]').on('change', prepareUpload);
+
+        // Grab the files and set them to our variable
+        function prepareUpload(event) {
+            files = event.target.files;
+        }
+
 
         function WorklistData() {
             self = this;
@@ -52,13 +74,8 @@
             selector: '#results-form',
             actions: {
                 confirm: function () {
-                    if (isXray) {
-                        saveXrayResults();//save xray results
-                    } else {
-                        saveResults();//save other non-xray results
-                    }
+                    saveXrayResults();//save xray results
                     resultsDialog.close();
-
                 },
                 cancel: function () {
                     resultsDialog.close();
@@ -75,6 +92,17 @@
         ko.applyBindings(resultDetails, jq("#results-form")[0]);
         ko.applyBindings(worklistData, jq("#radiology-worklist")[0]);
     });//End of Document Ready
+
+    //To handle success cases on posting results
+    function showSuccessResponse(responseText, statusText) {
+        location.reload();
+    }
+
+    //To handle error cases on posting results
+    function showErrorResponse(responseText, statusText) {
+        console.log(responseText);
+        console.log(statusText);
+    }
 
 
     function getWorklistData(showNotification) {
@@ -138,7 +166,10 @@
     function showResultForm(testDetail) {
         resultDetails.details(testDetail);
         orderIdd = testDetail.orderId;
+        testId = testDetail.testId;
         isXray = testDetail.xray;
+        jq("#testId").val(testId);
+        jq("#isXray").val(isXray);
         resultsDialog.show();
 
 
@@ -169,36 +200,15 @@
                     }
                 },
                 'json'
-        )
-    }
-    ;
-    function saveXrayResults() {
-        var rTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-            return item.orderId == orderIdd;
-        });
-        jq.post('${ui.actionLink("radiologyapp", "radiationResults", "saveXrayResults")}',
-                {
-                    "testId": rTest.testId,
-                    "RADIOLOGY XRAY DEFAULT FORM REPORT STATUS": jq("#filmSelect").val(),
-                    "RADIOLOGY XRAY DEFAULT FORM NOTE": jq("#note").val(),
-                    "RADIOLOGY XRAY FILM SIZE TYPE": jq("#filmSize").val()
-
-                },
-                function (data) {
-                    if (data.status === "fail") {
-                        jq().toastmessage('showErrorToast', data.message);
-                    } else {
-                        jq().toastmessage('showSuccessToast', data.message);
-                        var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-                            return item.orderId == orderIdd;
-                        });
-                        worklistData.worklistItems.remove(resultedTest);
-                    }
-                },
-                'json'
         );
     }
-    function saveResults() {
+
+    function saveXrayResults() {
+        jq("#resultsForm").submit();
+
+    }
+
+/*    function saveResults() {
         var rTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
             return item.orderId == orderIdd;
         });
@@ -224,24 +234,8 @@
         );
 
 
-    }
+    }*/
 
-    /* function getResultTemplate(testId) {
-     jq.getJSON('${ui.actionLink("radiologyapp", "radiationResults", "getResultTemp")}',
-     {"testId": testId}
-     ).success(function (parameterOptions) {
-     parameterOpts.parameterOptions.removeAll();
-     var details = ko.utils.arrayFirst(workList.items(), function (item) {
-     return item.testId == testId;
-     });
-     jq.each(parameterOptions, function (index, parameterOption) {
-     parameterOption['patientName'] = details.patientName;
-     parameterOption['testName'] = details.test.name;
-     parameterOption['startDate'] = details.startDate;
-     parameterOpts.parameterOptions.push(parameterOption);
-     });
-     });
-     }*/
 </script>
 
 <div class="fieldset">
@@ -361,7 +355,12 @@
     </div>
 
     <div class="dialog-content">
-        <form>
+        <form id="resultsForm" method="post" enctype="multipart/form-data"
+              action="${ui.actionLink("radiologyapp", "radiationResults", "saveXrayResults")}">
+
+            <input type="hidden" name="testId" value="" id="testId"/>
+            <input type="hidden" name="isXray" value="" id="isXray"/>
+
             <p>
 
             <div class="dialog-data">Patient Name:</div>
@@ -379,7 +378,7 @@
             <div class="dialog-data">Film Given:</div>
 
             <div class="inline">
-                <select id="filmSelect">
+                <select id="filmSelect" name="RADIOLOGY XRAY DEFAULT FORM REPORT STATUS">
                     <option value="0" selected>Please Select</option>
                     <option value="RADIOLOGY XRAY DEFAULT FORM FILM GIVEN">Film Given</option>
                     <option value="RADIOLOGY XRAY DEFAULT FORM FILM NOT GIVEN">Film Not Given</option>
@@ -391,7 +390,8 @@
 
             <div class="dialog-data">Scan Note</div>
 
-            <div class="inline"><input id="note" placeholder="Enter Scan Notes" required/></div>
+            <div class="inline"><input id="note" name="RADIOLOGY XRAY DEFAULT FORM NOTE" placeholder="Enter Scan Notes"
+                                       required/></div>
         </p>
 
 
@@ -400,7 +400,7 @@
             <div class="dialog-data">Film Size:</div>
 
             <div class="inline">
-                <select id="filmSize">
+                <select id="filmSize" name="RADIOLOGY XRAY FILM SIZE TYPE">
                     <option value="RADIOLOGY XRAY FILM SIZENA" selected>N/A</option>
                     <option value="RADIOLOGY XRAY FILM SIZE1">8*10</option>
                     <option value="RADIOLOGY XRAY FILM SIZE2">10*12</option>
@@ -411,13 +411,23 @@
             </div>
         </p>
 
+            <p>
+
+            <div class="dialog-data">File Upload</div>
+
+            <div class="inline">
+                <input size="30" type="file" name="file" id="file"/><br/>
+            </div>
+        </p>
+
 
 
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            <span class="button confirm right">Save</span>
+            <span class="button cancel">Cancel</span>
         </form>
-        <span class="button confirm right">Save</span>
-        <span class="button cancel">Cancel</span>
+
     </div>
 </div>
 

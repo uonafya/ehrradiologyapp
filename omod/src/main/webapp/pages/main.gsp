@@ -2,6 +2,7 @@
     ui.decorateWith("appui", "standardEmrPage", [title: "Radiology"])
     ui.includeCss("radiologyapp", "radiology.css")
     ui.includeJavascript("uicommons", "moment.js")
+    ui.includeJavascript("radiologyapp", "jquery.form.js")
 %>
 
 <script>
