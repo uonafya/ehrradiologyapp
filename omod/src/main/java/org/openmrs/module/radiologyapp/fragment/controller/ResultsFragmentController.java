@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -31,33 +30,7 @@ public class ResultsFragmentController {
 
     public SimpleObject searchResultsList(@RequestParam(value = "orderedDate") String acceptedDateString,
                                           @RequestParam(value = "investigation") Integer investigationId, @RequestParam(value = "phrase", required = false) String phrase,
-                                          UiUtils ui, HttpServletRequest request) {
-//        RadiologyService radiologyService = Context.getService(RadiologyService.class);
-//        Concept investigation = Context.getConceptService().getConcept(investigationId);
-//        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-//        Date resultsDate = null;
-//        try {
-//            resultsDate = dateFormatter.parse(acceptedDateString);
-//            Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
-//            Set<Concept> allowableTests = new HashSet<Concept>();
-//            if (investigation != null) {
-//                allowableTests = allowedInvestigations.get(investigation);
-//            } else {
-//                for (Concept concept : allowedInvestigations.keySet()) {
-//                    allowableTests.addAll(allowedInvestigations.get(concept));
-//                }
-//            }
-//            List<RadiologyTest> radiologyTests = radiologyService.getAcceptedRadiologyTests(resultsDate, phrase, allowableTests, 1);
-//            List<TestModel> tests = RadiologyUtil.generateModelsFromTests(radiologyTests, allowedInvestigations);
-//            Collections.sort(tests);
-//            return SimpleObject.create("status", "success",
-//                    "data",
-//                    SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender",
-//                            "age", "testName", "investigation", "testId", "orderId", "status", "givenFormId", "notGivenFormId", "givenEncounterId", "notGivenEncounterId", "xray"));
-//        } catch (ParseException e) {
-//            logger.error("An error occured while parsing date '{}'", acceptedDateString, e);
-//            return SimpleObject.create("status", "fail");
-//        }
+                                          UiUtils ui) {
         RadiologyService rs = (RadiologyService) Context.getService(RadiologyService.class);
         Concept investigation = Context.getConceptService().getConcept(investigationId);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");

@@ -182,8 +182,6 @@
         jq("#testId").val(testId);
         jq("#isXray").val(isXray);
         resultsDialog.show();
-
-
     }
 
     function reorder(orderId) {

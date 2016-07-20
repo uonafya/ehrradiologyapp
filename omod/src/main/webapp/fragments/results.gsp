@@ -41,6 +41,7 @@
             "phrase": phrase,
             "investigation": investigation,
         }).success(function (worklist) {
+            console.log(worklist);
             destroyResultslistDataTable();
 
             if (worklist.data.length === 0) {
@@ -87,13 +88,18 @@
         radiologyResultsListDataTable.destroy();
     }
 
-    function showResultForm(testDetail) {
-
-
+    function showEditResultForm(testDetail) {
+        resultDetails.details(testDetail);
+        orderIdd = testDetail.orderId;
+        testId = testDetail.testId;
+        isXray = testDetail.xray;
+        jq("#testId").val(testId);
+        jq("#isXray").val(isXray);
+        resultsDialog.show();
     }
 
-    function reorder(orderId) {
-
+    function loadPatientReport(patientId,testId) {
+        window.location = emr.pageLink("radiologyapp", "patientReport", {patientId: patientId, testId: testId});
     }
 
 </script>
@@ -151,9 +157,9 @@
             <td data-bind="text: age"></td>
             <td data-bind="text: testName"></td>
             <td>
-                <a title="Edit Results" data-bind="click: showResultForm, attr: { href : '#' }"><i
+                <a title="Edit Results" data-bind="click: showEditResultForm, attr: { href : '#' }"><i
                         class="icon-file-alt small"></i></a>
-                <a title="View Report" data-bind="attr: { href : 'javascript:reorder(' + orderId + ')' }"><i
+                <a title="View Report" data-bind="attr: { href : 'javascript:loadPatientReport(' + orderId + ', ' + testId + ')' }"><i
                         class="icon-bar-chart small"></i></a>
             </td>
         </tr>
