@@ -99,6 +99,29 @@
             event.preventDefault();
             saveSchedule();
         });
+
+
+        jq("#export-results-worklist").on("click", function() {
+            var downloadLink =
+                    emr.pageLink("radiologyapp", "reportExport",
+                            {
+                                "worklistDate" :
+                                        moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
+                                "phrase": jq("#worklist-phrase").val(),
+                                "investigation": jq("#worklist-investigation").val()
+                            }
+                    );
+            var win = window.open(downloadLink, '_blank');
+            if(win){
+                //Browser has allowed it to be opened
+                win.focus();
+            }else{
+                //Broswer has blocked it
+                alert('Please allow popups for this site');
+            }
+        });
+
+
         ko.applyBindings(scanDetails, jq("#reorder-form")[0]);
         ko.applyBindings(resultDetails, jq("#results-form")[0]);
         ko.applyBindings(worklistData, jq("#radiology-worklist")[0]);
@@ -232,6 +255,8 @@
         }
 
     }
+
+
 
 </script>
 
@@ -440,7 +465,7 @@
         Print
     </span>
 
-    <span class="button cancel right" style="margin-right: 5px;">
+    <span class="button cancel right" style="margin-right: 5px;" id="export-results-worklist">
         <i class="icon-print small"></i>
         Export
     </span>

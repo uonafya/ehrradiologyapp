@@ -61,8 +61,11 @@
 		</dependency>
 
 		<!-- End OpenMRS modules -->
-		
 
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+		</dependency>
 		<!-- Begin OpenMRS core -->
 
 		<dependency>
