@@ -7,6 +7,7 @@
     var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
     var scanDetails = {details: ko.observable(details)};
     var resultDetails = {details: ko.observable(details)};
+    var errorStatus = false;
     jq(function () {
 
         var options = {
@@ -75,13 +76,23 @@
             actions: {
                 confirm: function () {
                     saveXrayResults();//save xray results
-                    resultsDialog.close();
+                    if (!errorStatus) {
+                        resultsDialog.close();
+                    }
                 },
                 cancel: function () {
                     resultsDialog.close();
                 }
             }
         });
+
+        jq("#filmSelect").on('change',function(){
+            if(jq(this).val() !== "RADIOLOGY XRAY DEFAULT FORM FILM GIVEN" ){
+                jq("#filmSize").prop('disabled', 'disabled');
+            }else{
+                jq("#filmSize").prop('disabled', false);
+            }
+        })
 
 
         reorderForm = jq("#reorder-form").find("form").on("submit", function (event) {
@@ -204,37 +215,25 @@
     }
 
     function saveXrayResults() {
-        jq("#resultsForm").submit();
+        if (jq("#filmSelect").val() == "0") {
+            jq().toastmessage('showErrorToast', "Specify Film Given Status!");
+            errorStatus = true;
+        } else if (jq.trim(jq("#note").val()) <= 0) {
+            jq().toastmessage('showErrorToast', "Results Note is Mandatory!");
+            errorStatus = true;
+        }else{
+            errorStatus = false;
+        }
+
+
+
+        if (errorStatus) {
+            return false;
+        } else {
+            jq("#resultsForm").submit();
+        }
 
     }
-
-/*    function saveResults() {
-        var rTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-            return item.orderId == orderIdd;
-        });
-        testId = rTest.testId;
-        var sString = 'Given';
-        jq.post('${ui.actionLink("radiologyapp", "radiationResults", "saveResults")}',
-                {
-                    "testId": testId,
-                    "type": sString
-                },
-                function (data) {
-                    if (data.status === "fail") {
-                        jq().toastmessage('showErrorToast', data.message);
-                    } else {
-                        jq().toastmessage('showSuccessToast', data.message);
-                        var resultedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-                            return item.orderId == orderIdd;
-                        });
-                        worklistData.worklistItems.remove(resultedTest);
-                    }
-                },
-                'json'
-        );
-
-
-    }*/
 
 </script>
 
