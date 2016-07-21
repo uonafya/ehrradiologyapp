@@ -33,36 +33,7 @@ public class ReportExportPageController {
             @RequestParam(value = "worklistDate", required = false) String worklistDateString,
             @RequestParam(value = "phrase", required = false) String phrase,
             @RequestParam(value = "investigation", required = false) Integer investigationId,
-            @RequestParam(value = "includeResults", required = false) String includeResults,
             UiUtils ui) {
-
-//        RadiologyService radiologyService = Context.getService(RadiologyService.class);
-//        Concept investigation = Context.getConceptService().getConcept(investigationId);
-//        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-//        Date acceptedDate = null;
-//        try {
-//            acceptedDate = dateFormatter.parse(acceptedDateString);
-//            Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
-//            Set<Concept> allowableTests = new HashSet<Concept>();
-//            if (investigation != null) {
-//                allowableTests = allowedInvestigations.get(investigation);
-//            } else {
-//                for (Concept concept : allowedInvestigations.keySet()) {
-//                    allowableTests.addAll(allowedInvestigations.get(concept));
-//                }
-//            }
-//            List<RadiologyTest> radiologyTests = radiologyService.getAcceptedRadiologyTests(acceptedDate, phrase, allowableTests, 1);
-//            List<TestModel> tests = RadiologyUtil.generateModelsFromTests(radiologyTests, allowedInvestigations);
-//            Collections.sort(tests);
-//            return SimpleObject.create("status", "success",
-//                    "data",
-//                    SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender",
-//                            "age", "testName", "investigation", "testId", "orderId", "status", "givenFormId", "notGivenFormId", "givenEncounterId", "notGivenEncounterId", "xray"));
-//        } catch (ParseException e) {
-//            logger.error("An error occured while parsing date '{}'", acceptedDateString, e);
-//            return SimpleObject.create("status", "fail");
-//        }
-
 
         RadiologyService radiologyService = Context.getService(RadiologyService.class);
         Date worklistDate;
