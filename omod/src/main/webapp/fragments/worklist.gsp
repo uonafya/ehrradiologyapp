@@ -36,6 +36,23 @@
             radiologyWorklistDataTable.search(searchPhrase).draw();
         });
 
+        jq("#print-worklist").on("click", function() {
+            jq.getJSON('${ui.actionLink("radiologyapp", "worklist", "getWorksheet")}',
+                    {
+                        "date" : moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
+                        "phrase" : jq("#worklist-phrase").val(),
+                        "investigation" : jq("#worklist-investigation").val()
+                    }
+            ).success(function(data) {
+                        worksheet.items.removeAll();
+                        jq.each(data, function (index, item) {
+                            worksheet.items.push(item);
+                        });
+                        printData();
+                    });
+        });
+
+
 
         // Add events
         jq('input[type=file]').on('change', prepareUpload);
@@ -120,12 +137,23 @@
                 alert('Please allow popups for this site');
             }
         });
+        var worksheet = { items : ko.observableArray([]) };
 
 
         ko.applyBindings(scanDetails, jq("#reorder-form")[0]);
         ko.applyBindings(resultDetails, jq("#results-form")[0]);
         ko.applyBindings(worklistData, jq("#radiology-worklist")[0]);
+        ko.applyBindings(worksheet, jq("#worksheet")[0]);
     });//End of Document Ready
+
+    function printData() {
+        jq("#worksheet").print({
+            globalStyles: false,
+            mediaPrint: false,
+            stylesheet: '${ui.resourceLink("referenceapplication","styles/referenceapplication.css")}',
+            iframe: true
+        });
+    }
 
     //To handle success cases on posting results
     function showSuccessResponse(responseText, statusText) {
@@ -460,14 +488,56 @@
         Include result
     </label>
 
-    <span class="button task right">
+    <span class="button task right" id="print-worklist">
         <i class="icon-print small"></i>
-        Print
+        Print Worklist
     </span>
 
     <span class="button cancel right" style="margin-right: 5px;" id="export-results-worklist">
         <i class="icon-print small"></i>
-        Export
+        Export Worklist
     </span>
 
 </div>
+
+
+<!-- Worsheet -->
+<table id="worksheet">
+    <thead>
+    <tr>
+        <th>Order Date</th>
+        <th>Patient Identifier</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Department</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody data-bind="if: items().length == 0">
+    <tr>
+        <td colspan="9">No processed/pending test</td>
+    </tr>
+    </tbody>
+    <tbody data-bind="foreach: items">
+    <tr>
+        <td data-bind="text: startDate"></td>
+        <td data-bind="text: patientIdentifier"></td>
+        <td data-bind="text: patientName"></td>
+        <td data-bind="text: age"></td>
+        <td data-bind="text: gender"></td>
+        <td data-bind="text: investigation"></td>
+        <td data-bind="text: status"></td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Worksheet -->
+<style>
+.margin-left {
+    margin-left: 10px;
+}
+#worksheet {
+    display: none;
+}
+</style>

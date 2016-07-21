@@ -57,4 +57,43 @@ public class WorklistFragmentController {
 		}
 	}
 
+
+
+	public List<SimpleObject> getWorksheet(
+			@RequestParam(value = "date", required = false) String dateStr,
+			@RequestParam(value = "phrase", required = false) String phrase,
+			@RequestParam(value = "investigation", required = false) Integer investigationId,
+			UiUtils ui) {
+		RadiologyService rs = Context.getService(RadiologyService.class);
+		Concept investigation = Context.getConceptService().getConcept(investigationId);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date date = null;
+		List<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
+		try {
+			date = sdf.parse(dateStr);
+			Map<Concept, Set<Concept>> testTreeMap = RadiologyAppUtil.getAllowedInvestigations();
+			Set<Concept> allowableTests = new HashSet<Concept>();
+			if (investigation != null) {
+				allowableTests = testTreeMap.get(investigation);
+			} else {
+				for (Concept c : testTreeMap.keySet()) {
+					allowableTests.addAll(testTreeMap.get(c));
+				}
+			}
+			List<RadiologyTest> radiologyTests = rs.getAllRadiologyTestsByDate(
+					date, phrase, investigation);
+			List<TestModel> tests = RadiologyUtil.generateModelsFromTests(radiologyTests, testTreeMap);
+			Collections.sort(tests);
+			simpleObjects = SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName",
+					"gender", "age", "testName", "investigation", "testId", "orderId", "status");
+		} catch (ParseException e) {
+			logger.error("Error when parsing order date!", e.getMessage());
+			simpleObjects.add(SimpleObject.create("status", "error", "message", "Invalid date!"));
+		}
+
+		return simpleObjects;
+	}
+
+
+
 }
