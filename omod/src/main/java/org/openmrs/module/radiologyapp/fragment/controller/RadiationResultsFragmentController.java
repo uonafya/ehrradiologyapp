@@ -55,6 +55,7 @@ public class RadiationResultsFragmentController {
         if (!isXray) {
             type = "Given";
         }
+        System.out.println("Test this ID "+testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
         String encounterTypeStr = GlobalPropertyUtil.getString(BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
         EncounterType encounterType = Context.getEncounterService().getEncounterType(encounterTypeStr);

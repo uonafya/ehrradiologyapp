@@ -1,7 +1,32 @@
 <script>
     var radiologyResultsListTable, radiologyResultsListDataTable;
-    var resultsListData
+    var resultsListData;
+    var editResultDetails = {details: ko.observable(details)};
+    var editTestId,editOrderId,editIsXray;
+    var editResultDialog;
+    var editErrorStatus = false;
     jq(function () {
+        var options = {
+            target: '#editResultsForm',
+            success: showSuccessResponse,
+            error: showErrorResponse,
+            clearForm: true,
+            dataType: 'json'
+        };
+
+        jq('#editResultsForm').ajaxForm(options);
+
+        //To handle success cases on posting results
+        function showSuccessResponse(responseText, statusText) {
+            location.reload();
+        }
+
+        //To handle error cases on posting results
+        function showErrorResponse(responseText, statusText) {
+            console.log(responseText);
+            console.log(statusText);
+        }
+
         radiologyResultsListTable = jq('#radiology-results-table');
 		resultsListData = new ResultsListData();
         initializeResultsListDataTable();
@@ -19,7 +44,27 @@
             radiologyResultsListDataTable.search(searchPhrase).draw();
         });
 
+        editResultDialog = emr.setupConfirmationDialog({
+            dialogOpts: {
+                overlayClose: false,
+                close: true
+            },
+            selector: '#edit-results-form',
+            actions: {
+                confirm: function () {
+                    saveEditedXrayResults();//save xray results
+                    if (!editErrorStatus) {
+                        editResultDialog.close();
+                    }
+                },
+                cancel: function () {
+                    editResultDialog.close();
+                }
+            }
+        });
 
+
+        ko.applyBindings(editResultDetails, jq("#edit-results-form")[0]);
         ko.applyBindings(resultsListData, jq("#radiology-results")[0]);
     });//end of doc ready
 
@@ -41,7 +86,6 @@
             "phrase": phrase,
             "investigation": investigation,
         }).success(function (worklist) {
-            console.log(worklist);
             destroyResultslistDataTable();
 
             if (worklist.data.length === 0) {
@@ -89,17 +133,38 @@
     }
 
     function showEditResultForm(testDetail) {
-        resultDetails.details(testDetail);
-        orderIdd = testDetail.orderId;
-        testId = testDetail.testId;
-        isXray = testDetail.xray;
-        jq("#testId").val(testId);
-        jq("#isXray").val(isXray);
-        resultsDialog.show();
+        editResultDetails.details(testDetail);
+        editOrderId = testDetail.orderId;
+        editTestId = testDetail.testId;
+        editIsXray = testDetail.xray;
+        jq("#editTestId").val(editTestId);
+        jq("#editIsXray").val(editIsXray);
+        editResultDialog.show();
     }
 
     function loadPatientReport(patientId,testId) {
         window.location = emr.pageLink("radiologyapp", "patientReport", {patientId: patientId, testId: testId});
+    }
+
+    function saveEditedXrayResults() {
+        if (jq("#editFilmSelect").val() == "0") {
+            jq().toastmessage('showErrorToast', "Specify Film Given Status!");
+            editErrorStatus = true;
+        } else if (jq.trim(jq("#editNote").val()) <= 0) {
+            jq().toastmessage('showErrorToast', "Results Note is Mandatory!");
+            editErrorStatus = true;
+        }else{
+            editErrorStatus = false;
+        }
+
+
+
+        if (editErrorStatus) {
+            return false;
+        } else {
+            jq("#editResultsForm").submit();
+        }
+
     }
 
 </script>
@@ -158,7 +223,7 @@
             <td data-bind="text: testName"></td>
             <td>
                 <a title="Edit Results" data-bind="click: showEditResultForm, attr: { href : '#' }"><i
-                        class="icon-file-alt small"></i></a>
+                        class="icon-edit small"></i></a>
                 <a title="View Report" data-bind="attr: { href : 'javascript:loadPatientReport(' + orderId + ', ' + testId + ')' }"><i
                         class="icon-bar-chart small"></i></a>
             </td>
@@ -166,4 +231,88 @@
         </tbody>
     </table>
 
+</div>
+
+<div id="edit-results-form" title="Edit Radiology Results" class="dialog">
+    <div class="dialog-header">
+        <i class="icon-share"></i>
+
+        <h3>Edit Radiology Results</h3>
+    </div>
+
+    <div class="dialog-content">
+        <form id="editResultsForm" method="post" enctype="multipart/form-data"
+              action="${ui.actionLink("radiologyapp", "radiationResults", "saveXrayResults")}">
+
+            <input type="hidden" name="testId" value="" id="editTestId"/>
+            <input type="hidden" name="isXray" value="" id="editIsXray"/>
+
+            <p>
+
+            <div class="dialog-data">Patient Name:</div>
+
+            <div class="inline" data-bind="text: details().patientName"></div>
+        </p>
+            <p>
+
+            <div class="dialog-data">Test Date:</div>
+
+            <div class="inline" data-bind="text: details().startDate"></div>
+        </p>
+            <p>
+
+            <div class="dialog-data">Film Given:</div>
+
+            <div class="inline">
+                <select id="editFilmSelect" name="RADIOLOGY XRAY DEFAULT FORM REPORT STATUS">
+                    <option value="0" selected>Please Select</option>
+                    <option value="RADIOLOGY XRAY DEFAULT FORM FILM GIVEN">Film Given</option>
+                    <option value="RADIOLOGY XRAY DEFAULT FORM FILM NOT GIVEN">Film Not Given</option>
+                </select>
+
+            </div>
+        </p>
+            <p>
+
+            <div class="dialog-data">Scan Note</div>
+
+            <div class="inline"><input id="editNote" name="RADIOLOGY XRAY DEFAULT FORM NOTE" placeholder="Enter Scan Notes"
+                                       required/></div>
+        </p>
+
+
+            <p>
+
+            <div class="dialog-data">Film Size:</div>
+
+            <div class="inline">
+                <select id="editFilmSize" name="RADIOLOGY XRAY FILM SIZE TYPE">
+                    <option value="RADIOLOGY XRAY FILM SIZENA" selected>N/A</option>
+                    <option value="RADIOLOGY XRAY FILM SIZE1">8*10</option>
+                    <option value="RADIOLOGY XRAY FILM SIZE2">10*12</option>
+                    <option value="RADIOLOGY XRAY FILM SIZE3">12*15</option>
+
+                </select>
+
+            </div>
+        </p>
+
+            <p>
+
+            <div class="dialog-data">File Upload</div>
+
+            <div class="inline">
+                <input size="30" type="file" name="file" id="file"/><br/>
+            </div>
+        </p>
+
+
+
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            <span class="button confirm right">Save</span>
+            <span class="button cancel">Cancel</span>
+        </form>
+
+    </div>
 </div>
