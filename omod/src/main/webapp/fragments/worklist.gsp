@@ -8,6 +8,7 @@
     var scanDetails = {details: ko.observable(details)};
     var resultDetails = {details: ko.observable(details)};
     var errorStatus = false;
+    var isFileSelected;
     jq(function () {
 
         var options = {
@@ -36,14 +37,14 @@
             radiologyWorklistDataTable.search(searchPhrase).draw();
         });
 
-        jq("#print-worklist").on("click", function() {
+        jq("#print-worklist").on("click", function () {
             jq.getJSON('${ui.actionLink("radiologyapp", "worklist", "getWorksheet")}',
                     {
-                        "date" : moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
-                        "phrase" : jq("#worklist-phrase").val(),
-                        "investigation" : jq("#worklist-investigation").val()
+                        "date": moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
+                        "phrase": jq("#worklist-phrase").val(),
+                        "investigation": jq("#worklist-investigation").val()
                     }
-            ).success(function(data) {
+            ).success(function (data) {
                         worksheet.items.removeAll();
                         jq.each(data, function (index, item) {
                             worksheet.items.push(item);
@@ -53,13 +54,19 @@
         });
 
 
-
         // Add events
         jq('input[type=file]').on('change', prepareUpload);
 
         // Grab the files and set them to our variable
         function prepareUpload(event) {
             files = event.target.files;
+            if (files.length > 0) {
+                isFileSelected = true;
+            } else {
+                isFileSelected = false;
+                jq('input[type=file]').attr("disabled", "disabled");
+
+            }
         }
 
 
@@ -103,10 +110,10 @@
             }
         });
 
-        jq("#filmSelect").on('change',function(){
-            if(jq(this).val() !== "RADIOLOGY XRAY DEFAULT FORM FILM GIVEN" ){
+        jq("#filmSelect").on('change', function () {
+            if (jq(this).val() !== "RADIOLOGY XRAY DEFAULT FORM FILM GIVEN") {
                 jq("#filmSize").prop('disabled', 'disabled');
-            }else{
+            } else {
                 jq("#filmSize").prop('disabled', false);
             }
         })
@@ -118,26 +125,25 @@
         });
 
 
-        jq("#export-results-worklist").on("click", function() {
+        jq("#export-results-worklist").on("click", function () {
             var downloadLink =
                     emr.pageLink("radiologyapp", "reportExport",
                             {
-                                "worklistDate" :
-                                        moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
+                                "worklistDate": moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
                                 "phrase": jq("#worklist-phrase").val(),
                                 "investigation": jq("#worklist-investigation").val()
                             }
                     );
             var win = window.open(downloadLink, '_blank');
-            if(win){
+            if (win) {
                 //Browser has allowed it to be opened
                 win.focus();
-            }else{
+            } else {
                 //Broswer has blocked it
                 alert('Please allow popups for this site');
             }
         });
-        var worksheet = { items : ko.observableArray([]) };
+        var worksheet = {items: ko.observableArray([])};
 
 
         ko.applyBindings(scanDetails, jq("#reorder-form")[0]);
@@ -270,16 +276,18 @@
         } else if (jq.trim(jq("#note").val()) <= 0) {
             jq().toastmessage('showErrorToast', "Results Note is Mandatory!");
             errorStatus = true;
-        }else{
+        } else {
             errorStatus = false;
         }
-
 
 
         if (errorStatus) {
             return false;
         } else {
+            jq('input[type=file]').change();
             jq("#resultsForm").submit();
+
+
         }
 
     }
@@ -537,6 +545,7 @@
 .margin-left {
     margin-left: 10px;
 }
+
 #worksheet {
     display: none;
 }

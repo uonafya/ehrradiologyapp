@@ -55,7 +55,7 @@ public class RadiationResultsFragmentController {
         if (!isXray) {
             type = "Given";
         }
-        System.out.println("Test this ID "+testId);
+        System.out.println("Test this ID " + testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
         String encounterTypeStr = GlobalPropertyUtil.getString(BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
         EncounterType encounterType = Context.getEncounterService().getEncounterType(encounterTypeStr);
@@ -94,35 +94,38 @@ public class RadiationResultsFragmentController {
                     enc.addObs(obs);
             }
             Context.getEncounterService().saveEncounter(enc);
-            if (!file.isEmpty()) {
-                try {
-                    File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), "complex_obs");
-                    if (!imgDir.exists()) {
-                        FileUtils.forceMkdir(imgDir);
-                    }
-                    MultipartFileToInputStreamConverter converter = new MultipartFileToInputStreamConverter();
-                    stream = converter.convert(file);
-                    File f = new File(imgDir, file.getOriginalFilename());
-                    Files.copy(stream, f.toPath());
-
-                    Concept imageConcept = Context.getConceptService().getConceptByUuid("f53f4215-a17b-4516-b33f-854ffe663f61");
-                    obs = insertValue(enc, imageConcept, f.getName(), test);
-                    enc.addObs(obs);
-                    Context.getEncounterService().saveEncounter(enc);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                } finally {
+            if (file != null) {
+                if (!file.isEmpty()) {
                     try {
-                        stream.close();
+                        File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), "complex_obs");
+                        if (!imgDir.exists()) {
+                            FileUtils.forceMkdir(imgDir);
+                        }
+                        MultipartFileToInputStreamConverter converter = new MultipartFileToInputStreamConverter();
+                        stream = converter.convert(file);
+                        File f = new File(imgDir, file.getOriginalFilename());
+                        Files.copy(stream, f.toPath());
+
+                        Concept imageConcept = Context.getConceptService().getConceptByUuid("f53f4215-a17b-4516-b33f-854ffe663f61");
+                        obs = insertValue(enc, imageConcept, f.getName(), test);
+                        enc.addObs(obs);
+                        Context.getEncounterService().saveEncounter(enc);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            stream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                } else {
+                    System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
+                    log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
                 }
-            } else {
-                System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
-                log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
+
             }
 
             completeStatus = rs.completeTest(test);
