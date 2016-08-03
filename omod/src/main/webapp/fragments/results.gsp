@@ -2,7 +2,7 @@
     var radiologyResultsListTable, radiologyResultsListDataTable;
     var resultsListData;
     var editResultDetails = {details: ko.observable(details)};
-    var editTestId,editOrderId,editIsXray;
+    var editTestId, editOrderId, editIsXray,encounterId;
     var editResultDialog;
     var editErrorStatus = false;
     jq(function () {
@@ -28,10 +28,9 @@
         }
 
         radiologyResultsListTable = jq('#radiology-results-table');
-		resultsListData = new ResultsListData();
+        resultsListData = new ResultsListData();
         initializeResultsListDataTable();
-		getResultsData(false);
-
+        getResultsData(false);
 
 
         //Attach events to the Filter inputs
@@ -132,17 +131,49 @@
         radiologyResultsListDataTable.destroy();
     }
 
+    function loadPreviousResult(encounterId) {
+        jq.getJSON('${ui.actionLink("radiologyapp", "results", "loadResultsFromEncounter")}', {
+            "encounterId": encounterId
+        }).success(function (worklist) {
+            if (worklist.length === 0) {
+//                if (showNotification) {
+//                    jq().toastmessage('showNoticeToast', "No match found!");
+//                }
+//                resultsListData.resultsListItems([]);
+            } else {
+                jq.each(worklist, function( index, value ) {
+                    if(value.concept.name === "RADIOLOGY XRAY DEFAULT FORM NOTE"){
+                        jq("#editNote").val(value.valueText);
+                    }else if(value.concept.name === "RADIOLOGY XRAY FILM SIZE TYPE"){
+                        jq("#editFilmSize").val(value.valueCoded.name);
+                    }else if(value.concept.name === "RADIOLOGY XRAY DEFAULT FORM REPORT STATUS"){
+                        jq("#editFilmSelect").val(value.valueCoded.name);
+                    }else if(value.concept.name === "RADIOLOGY IMAGE PATH"){
+                        //do not do this programmatically
+                       // jq("#file").val("");
+                    }
+                });
+//                resultsListData.resultsListItems(worklist.data);
+            }
+        });
+    }
+
     function showEditResultForm(testDetail) {
+        console.log(testDetail);
         editResultDetails.details(testDetail);
         editOrderId = testDetail.orderId;
         editTestId = testDetail.testId;
         editIsXray = testDetail.xray;
+        encounterId=testDetail.givenEncounterId;
         jq("#editTestId").val(editTestId);
         jq("#editIsXray").val(editIsXray);
+        jq("#encounterId").val(encounterId);
+        loadPreviousResult(testDetail.givenEncounterId);
+        //preload the test
         editResultDialog.show();
     }
 
-    function loadPatientReport(patientId,testId) {
+    function loadPatientReport(patientId, testId) {
         window.location = emr.pageLink("radiologyapp", "patientReport", {patientId: patientId, testId: testId});
     }
 
@@ -153,10 +184,9 @@
         } else if (jq.trim(jq("#editNote").val()) <= 0) {
             jq().toastmessage('showErrorToast', "Results Note is Mandatory!");
             editErrorStatus = true;
-        }else{
+        } else {
             editErrorStatus = false;
         }
-
 
 
         if (editErrorStatus) {
@@ -224,7 +254,8 @@
             <td>
                 <a title="Edit Results" data-bind="click: showEditResultForm, attr: { href : '#' }"><i
                         class="icon-edit small"></i></a>
-                <a title="View Report" data-bind="attr: { href : 'javascript:loadPatientReport(' + orderId + ', ' + testId + ')' }"><i
+                <a title="View Report"
+                   data-bind="attr: { href : 'javascript:loadPatientReport(' + orderId + ', ' + testId + ')' }"><i
                         class="icon-bar-chart small"></i></a>
             </td>
         </tr>
@@ -242,10 +273,11 @@
 
     <div class="dialog-content">
         <form id="editResultsForm" method="post" enctype="multipart/form-data"
-              action="${ui.actionLink("radiologyapp", "radiationResults", "saveXrayResults")}">
+              action="${ui.actionLink("radiologyapp", "radiationResults", "editXrayResults")}">
 
             <input type="hidden" name="testId" value="" id="editTestId"/>
             <input type="hidden" name="isXray" value="" id="editIsXray"/>
+            <input type="hidden" name="encounterId" value="" id="encounterId"/>
 
             <p>
 
@@ -258,6 +290,13 @@
             <div class="dialog-data">Test Date:</div>
 
             <div class="inline" data-bind="text: details().startDate"></div>
+        </p>
+        </p>
+            <p>
+
+            <div class="dialog-data">Test Name:</div>
+
+            <div class="inline" data-bind="text: details().testName"></div>
         </p>
             <p>
 
@@ -276,7 +315,8 @@
 
             <div class="dialog-data">Scan Note</div>
 
-            <div class="inline"><input id="editNote" name="RADIOLOGY XRAY DEFAULT FORM NOTE" placeholder="Enter Scan Notes"
+            <div class="inline"><input id="editNote" name="RADIOLOGY XRAY DEFAULT FORM NOTE"
+                                       placeholder="Enter Scan Notes"
                                        required/></div>
         </p>
 

@@ -1,6 +1,8 @@
 package org.openmrs.module.radiologyapp.fragment.controller;
 
 import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
@@ -58,4 +60,15 @@ public class ResultsFragmentController {
             return SimpleObject.create("status", "fail");
         }
     }
+
+
+    public List<SimpleObject> loadResultsFromEncounter(@RequestParam(value = "encounterId") Integer encounterId,
+                                                      UiUtils ui) {
+        Encounter encounter = Context.getEncounterService().getEncounter(encounterId);
+        Set<Obs> allObs = encounter.getAllObs();
+        return SimpleObject.fromCollection(allObs,ui,"concept.conceptId","concept.name","valueCoded.name","valueText");
+
+    }
+
+
 }

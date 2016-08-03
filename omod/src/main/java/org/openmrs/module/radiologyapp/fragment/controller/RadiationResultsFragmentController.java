@@ -55,6 +55,7 @@ public class RadiationResultsFragmentController {
         if (!isXray) {
             type = "Given";
         }
+
         System.out.println("Test this ID " + testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
         String encounterTypeStr = GlobalPropertyUtil.getString(BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
@@ -132,6 +133,75 @@ public class RadiationResultsFragmentController {
             return SimpleObject.create("status", "success", "message", "Xray Results Saved Successfully", "completeStatus", completeStatus);
         }
         return SimpleObject.create("status", "fail", "message", "Error Saving Xray Results", "completeStatus", "Error");
+    }
+
+    public SimpleObject editXrayResults(UiUtils uiUtils,
+                                        @RequestParam(value = "file", required = false) MultipartFile file,
+                                        @RequestParam(value = "encounterId", required = false) String encounterId,
+                                        HttpServletRequest request) {
+        InputStream stream = null;
+        //process save scan/xray results
+        RadiologyService rs = (RadiologyService) Context.getService(RadiologyService.class);
+        String testId = request.getParameter("testId");
+        String type = "Not Given";
+        boolean isXray = Boolean.parseBoolean(request.getParameter("isXray"));
+        if (!isXray) {
+            type = "Given";
+        }
+
+        System.out.println("Test this ID " + testId);
+        RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
+
+        Encounter enc=Context.getEncounterService().getEncounter(Integer.parseInt(encounterId));
+
+        Map<String, String> parameters = buildParameterList(request);
+        if (enc != null) {
+            test.setEncounter(enc);
+            rs.saveRadiologyTest(test);
+
+            Obs obs;
+            for (String key : parameters.keySet()) {
+                Concept concept = RadiologyUtil.searchConcept(key);
+                obs = insertValue(enc, concept, parameters.get(key), test);
+                enc.addObs(obs);
+            }
+            Context.getEncounterService().saveEncounter(enc);
+            if (file != null) {
+                if (!file.isEmpty()) {
+                    try {
+                        File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), "complex_obs");
+                        if (!imgDir.exists()) {
+                            FileUtils.forceMkdir(imgDir);
+                        }
+                        MultipartFileToInputStreamConverter converter = new MultipartFileToInputStreamConverter();
+                        stream = converter.convert(file);
+                        File f = new File(imgDir, file.getOriginalFilename());
+                        Files.copy(stream, f.toPath());
+
+                        Concept imageConcept = Context.getConceptService().getConceptByUuid("f53f4215-a17b-4516-b33f-854ffe663f61");
+                        obs = insertValue(enc, imageConcept, f.getName(), test);
+                        enc.addObs(obs);
+                        Context.getEncounterService().saveEncounter(enc);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            stream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
+                    log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
+                }
+
+            }
+            return SimpleObject.create("status", "success", "message", "Xray Results Edited Successfully");
+        }
+        return SimpleObject.create("status", "fail", "message", "Error Editing Xray Results", "completeStatus", "Error");
     }
 
 
