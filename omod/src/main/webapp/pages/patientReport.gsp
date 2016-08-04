@@ -1,5 +1,5 @@
 <%
-    ui.decorateWith("appui", "standardEmrPage", [title: "Laboratory Reports"])
+    ui.decorateWith("appui", "standardEmrPage", [title: "Radiology Reports"])
     ui.includeJavascript("billingui", "moment.js")
 
 
@@ -16,10 +16,6 @@
         jq('#agename').html('${patient.age} years (' + moment('${patient.birthdate}').format('DD,MMM YYYY') + ')');
         jq('.tad').text('Last Visit: ' + moment('${previousVisit}').format('DD.MM.YYYY hh:mm') + ' HRS');
 
-//        ko.applyBindings(results, jq("#patient-report")[0]);
-//        jq.each(initialResults, function (index, initialResult) {
-//            results.items.push(initialResult);
-//        });
     });
 </script>
 
@@ -86,17 +82,18 @@
 
 <body>
 <div class="clear"></div>
+
 <div class="container">
     <div class="example">
         <ul id="breadcrumbs">
             <li>
-                <a href="${ui.pageLink('referenceapplication','home')}">
+                <a href="${ui.pageLink('referenceapplication', 'home')}">
                     <i class="icon-home small"></i></a>
             </li>
 
             <li>
                 <i class="icon-chevron-right link"></i>
-                <a href="${ui.pageLink('radiologyapp','main')}#results">Radiology</a>
+                <a href="${ui.pageLink('radiologyapp', 'main')}#results">Radiology</a>
             </li>
 
             <li>
@@ -126,11 +123,14 @@
             </h1>
 
             <br/>
+
             <div id="stacont" class="status-container">
                 <span class="status active"></span>
                 Visit Status
             </div>
+
             <div class="tag">Outpatient ${fileNumber}</div>
+
             <div class="tad">Last Visit</div>
         </div>
 
@@ -143,6 +143,7 @@
                 <i class="icon-tags small" style="font-size: 16px"></i><small>Category:</small> ${category}
             </div>
         </div>
+
         <div class="close"></div>
     </div>
 </div>
@@ -156,13 +157,15 @@
         <th>Note</th>
         <th>Film Given</th>
         <th>Film Size</th>
-        <th>Action</th>
     </tr>
     </thead>
 
-    <tbody >
+    <tbody>
     <tr style="font-size: 14px;">
-        <td colspan="5" align="center">NO RESULTS FOUND</td>
+        <td align="center">${radiologyTest}</td>
+        <td align="center">${_2539}</td>
+        <td align="center">${_2495}</td>
+        <td align="center">${_3710}</td>
     </tr>
     </tbody>
 </table>

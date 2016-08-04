@@ -159,7 +159,6 @@
     }
 
     function showEditResultForm(testDetail) {
-        console.log(testDetail);
         editResultDetails.details(testDetail);
         editOrderId = testDetail.orderId;
         editTestId = testDetail.testId;
@@ -173,8 +172,8 @@
         editResultDialog.show();
     }
 
-    function loadPatientReport(patientId, testId) {
-        window.location = emr.pageLink("radiologyapp", "patientReport", {patientId: patientId, testId: testId});
+    function loadPatientReport(patientId, testId,encounterId) {
+        window.location = emr.pageLink("radiologyapp", "patientReport", {patientId: patientId, testId: testId, encounterId: encounterId});
     }
 
     function saveEditedXrayResults() {
@@ -255,7 +254,7 @@
                 <a title="Edit Results" data-bind="click: showEditResultForm, attr: { href : '#' }"><i
                         class="icon-edit small"></i></a>
                 <a title="View Report"
-                   data-bind="attr: { href : 'javascript:loadPatientReport(' + orderId + ', ' + testId + ')' }"><i
+                   data-bind="attr: { href : 'javascript:loadPatientReport(' + orderId + ', ' + testId + ', ' + givenEncounterId+ ')' }"><i
                         class="icon-bar-chart small"></i></a>
             </td>
         </tr>

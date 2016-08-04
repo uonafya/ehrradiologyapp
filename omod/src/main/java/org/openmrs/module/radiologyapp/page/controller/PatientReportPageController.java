@@ -1,6 +1,8 @@
 package org.openmrs.module.radiologyapp.page.controller;
 
 import org.apache.commons.lang.StringUtils;
+import org.openmrs.Encounter;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appui.UiSessionContext;
@@ -13,6 +15,8 @@ import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Set;
+
 /**
  * @author Stanslaus Odhiambo
  *         Created on 7/20/2016.
@@ -21,7 +25,7 @@ public class PatientReportPageController {
 
     public String get(
             UiSessionContext sessionContext, @RequestParam(value = "testId") Integer testId,
-            PageModel model,
+            PageModel model, @RequestParam(value = "encounterId") Integer encounterId,
             UiUtils ui,
             PageRequest pageRequest) {
         pageRequest.getSession().setAttribute(ReferenceApplicationWebConstants.SESSION_ATTRIBUTE_REDIRECT_URL, ui.thisUrl());
@@ -36,13 +40,13 @@ public class PatientReportPageController {
         HospitalCoreService hcs = Context.getService(HospitalCoreService.class);
 
         model.addAttribute("patient", patient);
+        model.addAttribute("radiologyTest", radiologyTest.getConcept().getName().getName());
         model.addAttribute("patientIdentifier", patient.getPatientIdentifier());
         model.addAttribute("age", patient.getAge());
         model.addAttribute("gender", patient.getGender());
         model.addAttribute("name", patient.getNames());
         model.addAttribute("category", patient.getAttribute(14));
         model.addAttribute("previousVisit", hcs.getLastVisitTime(patient));
-
         if (patient.getAttribute(43) == null) {
             model.addAttribute("fileNumber", "");
         } else if (StringUtils.isNotBlank(patient.getAttribute(43).getValue())) {
@@ -51,24 +55,17 @@ public class PatientReportPageController {
             model.addAttribute("fileNumber", "");
         }
 
+        Encounter encounter = Context.getEncounterService().getEncounter(encounterId);
+        Set<Obs> allObs = encounter.getAllObs();
+
+        for (Obs obs : allObs) {
+            model.addAttribute("_"+obs.getConcept().getConceptId(),
+                    obs.getValueText() == null ? obs.getValueCoded().getName().getName() : obs.getValueText());
+            System.out.printf("%s:%s",obs.getConcept().getConceptId().toString(),
+                    obs.getValueText() == null ? obs.getValueCoded().getName().getName() : obs.getValueText());
+        }
 
 
-//        if (patient != null) {
-//            RadiologyTest radiologyTest = rs.getRadiologyTestById(testId);
-//            if (radiologyTest != null) {
-//                Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
-//                List<TestModel> trms = renderTests(labTest, testTreeMap);
-//                trms = formatTestResult(trms);
-//
-//                List<SimpleObject> results = SimpleObject.fromCollection(trms, ui,
-//                        "investigation", "set", "test", "value", "hiNormal",
-//                        "lowNormal", "lowAbsolute", "hiAbsolute", "hiCritical", "lowCritical",
-//                        "unit", "level", "concept", "encounterId", "testId");
-//                SimpleObject currentResults = SimpleObject.create("data", results);
-//                model.addAttribute("currentResults", currentResults);
-//                model.addAttribute("test", ui.formatDatePretty(labTest.getOrder().getStartDate()));
-//            }
-//        }
         return null;
     }
 
