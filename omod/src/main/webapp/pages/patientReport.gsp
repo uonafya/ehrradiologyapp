@@ -17,6 +17,10 @@
         jq('.tad').text('Last Visit: ' + moment('${previousVisit}').format('DD.MM.YYYY hh:mm') + ' HRS');
 
     });
+
+    function loadRadiologyImage(){
+        console.log("Not Yet Implemented!");
+    }
 </script>
 
 <style>
@@ -157,6 +161,7 @@
         <th>Note</th>
         <th>Film Given</th>
         <th>Film Size</th>
+        <th>Action</th>
     </tr>
     </thead>
 
@@ -166,6 +171,12 @@
         <td align="center">${_2539}</td>
         <td align="center">${_2495}</td>
         <td align="center">${_3710}</td>
+        <td align="center">
+            <a title="View Image"
+               onclick="javascript:loadRadiologyImage()"><i
+                    class="icon-picture small"></i></a>
+
+        </td>
     </tr>
     </tbody>
 </table>

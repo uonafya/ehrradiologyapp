@@ -2,7 +2,7 @@
     var radiologyWorklistTable = jq('#radiology-worklist-table');
     var radiologyWorklistDataTable;
     var worklistData, reorderDialog, reorderForm, resultsDialog;
-    var orderIdd, files;
+    var orderIdd;
     var isXray, testId;
     var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
     var scanDetails = {details: ko.observable(details)};
@@ -54,20 +54,7 @@
         });
 
 
-        // Add events
-        jq('input[type=file]').on('change', prepareUpload);
 
-        // Grab the files and set them to our variable
-        function prepareUpload(event) {
-            files = event.target.files;
-            if (files.length > 0) {
-                isFileSelected = true;
-            } else {
-                isFileSelected = false;
-                jq('input[type=file]').attr("disabled", "disabled");
-
-            }
-        }
 
 
         function WorklistData() {

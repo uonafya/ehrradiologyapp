@@ -2,7 +2,7 @@
     var radiologyResultsListTable, radiologyResultsListDataTable;
     var resultsListData;
     var editResultDetails = {details: ko.observable(details)};
-    var editTestId, editOrderId, editIsXray,encounterId;
+    var editTestId, editOrderId, editIsXray, encounterId;
     var editResultDialog;
     var editErrorStatus = false;
     jq(function () {
@@ -136,24 +136,16 @@
             "encounterId": encounterId
         }).success(function (worklist) {
             if (worklist.length === 0) {
-//                if (showNotification) {
-//                    jq().toastmessage('showNoticeToast', "No match found!");
-//                }
-//                resultsListData.resultsListItems([]);
             } else {
-                jq.each(worklist, function( index, value ) {
-                    if(value.concept.name === "RADIOLOGY XRAY DEFAULT FORM NOTE"){
+                jq.each(worklist, function (index, value) {
+                    if (value.concept.name === "RADIOLOGY XRAY DEFAULT FORM NOTE") {
                         jq("#editNote").val(value.valueText);
-                    }else if(value.concept.name === "RADIOLOGY XRAY FILM SIZE TYPE"){
+                    } else if (value.concept.name === "RADIOLOGY XRAY FILM SIZE TYPE") {
                         jq("#editFilmSize").val(value.valueCoded.name);
-                    }else if(value.concept.name === "RADIOLOGY XRAY DEFAULT FORM REPORT STATUS"){
+                    } else if (value.concept.name === "RADIOLOGY XRAY DEFAULT FORM REPORT STATUS") {
                         jq("#editFilmSelect").val(value.valueCoded.name);
-                    }else if(value.concept.name === "RADIOLOGY IMAGE PATH"){
-                        //do not do this programmatically
-                       // jq("#file").val("");
                     }
                 });
-//                resultsListData.resultsListItems(worklist.data);
             }
         });
     }
@@ -163,7 +155,7 @@
         editOrderId = testDetail.orderId;
         editTestId = testDetail.testId;
         editIsXray = testDetail.xray;
-        encounterId=testDetail.givenEncounterId;
+        encounterId = testDetail.givenEncounterId;
         jq("#editTestId").val(editTestId);
         jq("#editIsXray").val(editIsXray);
         jq("#encounterId").val(encounterId);
@@ -172,8 +164,12 @@
         editResultDialog.show();
     }
 
-    function loadPatientReport(patientId, testId,encounterId) {
-        window.location = emr.pageLink("radiologyapp", "patientReport", {patientId: patientId, testId: testId, encounterId: encounterId});
+    function loadPatientReport(patientId, testId, encounterId) {
+        window.location = emr.pageLink("radiologyapp", "patientReport", {
+            patientId: patientId,
+            testId: testId,
+            encounterId: encounterId
+        });
     }
 
     function saveEditedXrayResults() {
@@ -263,6 +259,7 @@
 
 </div>
 
+
 <div id="edit-results-form" title="Edit Radiology Results" class="dialog">
     <div class="dialog-header">
         <i class="icon-share"></i>
@@ -273,7 +270,6 @@
     <div class="dialog-content">
         <form id="editResultsForm" method="post" enctype="multipart/form-data"
               action="${ui.actionLink("radiologyapp", "radiationResults", "editXrayResults")}">
-
             <input type="hidden" name="testId" value="" id="editTestId"/>
             <input type="hidden" name="isXray" value="" id="editIsXray"/>
             <input type="hidden" name="encounterId" value="" id="encounterId"/>
@@ -289,7 +285,7 @@
             <div class="dialog-data">Test Date:</div>
 
             <div class="inline" data-bind="text: details().startDate"></div>
-        </p>
+
         </p>
             <p>
 
@@ -341,11 +337,9 @@
             <div class="dialog-data">File Upload</div>
 
             <div class="inline">
-                <input size="30" type="file" name="file" id="file"/><br/>
+                <input size="30" type="file" name="editedFile" id="editedFile"/><br/>
             </div>
         </p>
-
-
 
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
@@ -355,3 +349,5 @@
 
     </div>
 </div>
+
+
