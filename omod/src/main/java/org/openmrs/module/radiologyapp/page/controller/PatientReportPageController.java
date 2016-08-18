@@ -83,30 +83,33 @@ public class PatientReportPageController {
                 Image img = null;
                 BufferedImage image = null;
                 try {
-                    image=getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
-
+//                    ImageIO.scanForPlugins();
+//                    Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
+//                    BufferedImage imagetry = ImageIO.read(imgFile);
+                    image = getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
                 } catch (IOException e) {
-                    System.out.println("\nError: couldn't read dicom image!"+ e.getMessage());
+                    System.out.println("\nError: couldn't read dicom image!" + e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 model.addAttribute("imgFile", img);
-                model.addAttribute("imgFileRaw", imgFile);
+                model.addAttribute("imgFileRaw", image);
             }
         }
-
-
         return null;
     }
 
     public static BufferedImage getPixelDataAsBufferedImage(byte[] dicomData)
             throws IOException {
+        ImageIO.scanForPlugins();
         ByteArrayInputStream bais = new ByteArrayInputStream(dicomData);
         BufferedImage buff = null;
         Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
-        ImageReader reader = (ImageReader) iter.next();
+        ImageReader reader = iter.next();
         DicomImageReadParam param = (DicomImageReadParam) reader.getDefaultReadParam();
-        ImageInputStream iis = ImageIO.createImageInputStream(bais);
+        ImageInputStream iis = null;
+//        TODO check plugin for specific dicom processor header
+        iis = ImageIO.createImageInputStream(bais);
         reader.setInput(iis, false);
         buff = reader.read(0, param);
         iis.close();
