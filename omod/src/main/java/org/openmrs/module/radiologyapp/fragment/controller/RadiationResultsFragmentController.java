@@ -39,7 +39,7 @@ import java.util.*;
  *         Created on 7/13/2016.
  */
 public class RadiationResultsFragmentController {
-    public static final String ROOT = "upload-dir";
+    public static final String ROOT = "complex_obs";
     private static final Logger log = LoggerFactory.getLogger(RadiationResultsFragmentController.class);
 
 
@@ -98,7 +98,7 @@ public class RadiationResultsFragmentController {
             if (file != null) {
                 if (!file.isEmpty()) {
                     try {
-                        File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), "complex_obs");
+                        File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), ROOT);
                         if (!imgDir.exists()) {
                             FileUtils.forceMkdir(imgDir);
                         }
