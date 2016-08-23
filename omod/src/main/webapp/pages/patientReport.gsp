@@ -194,7 +194,7 @@
 
     <tr id="radImage">
         <td align="center" colspan="2">${_100126232}</td>
-        <td align="center" colspan="3">${imgFile}</td>
+        <td align="center" colspan="3">${imgFileRaw}</td>
     </tr>
     </tbody>
 </table>
@@ -371,9 +371,9 @@
 
         var element = jq('#dicomImage').get(0);
         cornerstone.enable(element);
-        var imageFile = "${imgFile}";
+        var imageFile = "${imgFileRaw.getSize()}";
         console.log(imageFile);
-//        loadAndViewImage(imageFile);
+        loadAndViewImage(imageFile);
 
         jq('#selectFile').on('change', function (e) {
             // Add the file to the cornerstoneFileImageLoader and get unique

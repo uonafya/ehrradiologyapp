@@ -76,26 +76,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.dcm4che</groupId>
-            <artifactId>dcm4che-core</artifactId>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dcm4che</groupId>
-            <artifactId>dcm4che-imageio</artifactId>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.dcm4che</groupId>
-            <artifactId>dcm4che-imageio-rle</artifactId>
-            <scope>provided</scope>
-            <type>jar</type>
-        </dependency>
-
-        <dependency>
             <groupId>javax.media</groupId>
             <artifactId>jai_core</artifactId>
             <type>jar</type>
@@ -135,6 +115,11 @@
             <artifactId>openmrs-test</artifactId>
             <type>pom</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>3.0.5.RELEASE</version>
         </dependency>
 
         <!-- End OpenMRS core -->

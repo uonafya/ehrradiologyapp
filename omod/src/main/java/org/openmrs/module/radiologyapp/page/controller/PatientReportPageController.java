@@ -1,8 +1,6 @@
 package org.openmrs.module.radiologyapp.page.controller;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.dcm4che2.imageio.plugins.dcm.DicomImageReadParam;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
@@ -16,7 +14,9 @@ import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
 import org.openmrs.util.OpenmrsUtil;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -25,8 +25,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -77,6 +77,7 @@ public class PatientReportPageController {
             model.addAttribute("_" + obs.getConcept().getConceptId(),
                     obs.getValueText() == null ? obs.getValueCoded().getName().getName() : obs.getValueText());
             if (obs.getConcept().getConceptId() == 100126232) {
+                MultipartFile toLoad = null;
 //               load the image file
                 File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), ROOT);
                 File imgFile = new File(imgDir, obs.getValueText());
@@ -86,18 +87,31 @@ public class PatientReportPageController {
 //                    ImageIO.scanForPlugins();
 //                    Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
 //                    BufferedImage imagetry = ImageIO.read(imgFile);
-                    image = getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
+
+//                    image = getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
+                    byte[] content = Files.readAllBytes(imgFile.toPath());
+                    System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                    System.out.println(content.length);
+                    System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                    String contentType = "application/dicom";
+                    toLoad = new MockMultipartFile(imgFile.getName(), imgFile.getName(), contentType, content);
+                    System.out.println(toLoad);
+                    System.out.println("=============================================================================");
+                    System.out.println(toLoad.getName());
+                    System.out.println(toLoad.getContentType());
+                    System.out.println(toLoad.getSize());
+                    System.out.println(toLoad.getOriginalFilename());
                 } catch (IOException e) {
                     System.out.println("\nError: couldn't read dicom image!" + e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                model.addAttribute("imgFile", img);
-                model.addAttribute("imgFileRaw", image);
+                model.addAttribute("imgFileRaw", toLoad);
             }
         }
         return null;
     }
+
 
     public static BufferedImage getPixelDataAsBufferedImage(byte[] dicomData)
             throws IOException {
@@ -106,12 +120,12 @@ public class PatientReportPageController {
         BufferedImage buff = null;
         Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
         ImageReader reader = iter.next();
-        DicomImageReadParam param = (DicomImageReadParam) reader.getDefaultReadParam();
+//        DicomImageReadParam param = (DicomImageReadParam) reader.getDefaultReadParam();
         ImageInputStream iis = null;
 //        TODO check plugin for specific dicom processor header
         iis = ImageIO.createImageInputStream(bais);
         reader.setInput(iis, false);
-        buff = reader.read(0, param);
+//        buff = reader.read(0, param);
         iis.close();
         if (buff == null) {
             throw new IOException("Could not read Dicom file. Maybe pixel data is invalid.");
