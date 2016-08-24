@@ -152,7 +152,7 @@ public class RadiationResultsFragmentController {
         System.out.println("Test this ID " + testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
 
-        Encounter enc=Context.getEncounterService().getEncounter(Integer.parseInt(encounterId));
+        Encounter enc = Context.getEncounterService().getEncounter(Integer.parseInt(encounterId));
 
         Map<String, String> parameters = buildParameterList(request);
         if (enc != null) {
@@ -338,6 +338,19 @@ public class RadiationResultsFragmentController {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+
+    public byte[] loadDicomImage(@RequestParam(value = "file", required = false) String file) {
+        File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), ROOT);
+        File imgFile = new File(imgDir, file);
+        byte[] content = new byte[0];
+        try {
+            content = Files.readAllBytes(imgFile.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content;
     }
 
 

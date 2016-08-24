@@ -154,9 +154,6 @@
                 <version>1.3.2</version>
             </dependency>
 
-
-
-
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
@@ -164,21 +161,18 @@
                 <scope>provided</scope>
             </dependency>
             <!-- End OpenMRS core -->
-            <!-- https://mvnrepository.com/artifact/javax.media/jai_core -->
+
             <dependency>
-                <groupId>javax.media</groupId>
-                <artifactId>jai_core</artifactId>
+                <groupId>javax.media.jai</groupId>
+                <artifactId>com.springsource.javax.media.jai.core</artifactId>
+                <version>1.1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.media.jai</groupId>
+                <artifactId>com.springsource.javax.media.jai.codec</artifactId>
                 <version>1.1.3</version>
             </dependency>
 
-
-
-            <!-- https://mvnrepository.com/artifact/com.sun.media/jai_imageio -->
-            <dependency>
-                <groupId>com.sun.media</groupId>
-                <artifactId>jai_imageio</artifactId>
-                <version>1.1</version>
-            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -220,17 +214,15 @@
     </build>
 
     <repositories>
-
-        <repository>
-            <id>www.dcm4che.org</id>
-            <name>dcm4che Repository</name>
-            <url>http://www.dcm4che.org/maven2</url>
-        </repository>
-
         <repository>
             <id>openmrs-repo</id>
             <name>OpenMRS Nexus Repository</name>
             <url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+        </repository>
+        <repository>
+            <id>com.springsource.repository.bundles.external</id>
+            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
         </repository>
 
     </repositories>

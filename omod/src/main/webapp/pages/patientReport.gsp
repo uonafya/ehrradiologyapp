@@ -28,7 +28,26 @@
         jq('#agename').html('${patient.age} years (' + moment('${patient.birthdate}').format('DD,MMM YYYY') + ')');
         jq('.tad').text('Last Visit: ' + moment('${previousVisit}').format('DD.MM.YYYY hh:mm') + ' HRS');
         jq("#radImage").hide();
+
+        /*jq.get('${ui.actionLink("radiologyapp", "radiationResults", "loadDicomImage")}', function (data) {
+            alert("Data Loaded: " + data);
+        });*/
     });//end of doc ready
+
+    function getDicom(fileName){
+        jq.ajax({
+            url: '${ui.actionLink("radiologyapp", "radiationResults", "loadDicomImage")}',
+            data: {
+                "fileName" : fileName
+            },
+            success: successResult(data),
+            dataType: 'binary'
+        });
+    }
+
+    function successResult(data){
+        console.log(data);
+    }
 
 
     function loadRadiologyImage() {
@@ -371,8 +390,10 @@
 
         var element = jq('#dicomImage').get(0);
         cornerstone.enable(element);
-        var imageFile = "${imgFileRaw.getSize()}";
+        var imageFile = "${imgFileRaw}";
         console.log(imageFile);
+
+
         loadAndViewImage(imageFile);
 
         jq('#selectFile').on('change', function (e) {

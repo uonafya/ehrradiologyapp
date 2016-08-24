@@ -1,5 +1,6 @@
 package org.openmrs.module.radiologyapp.page.controller;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
@@ -25,6 +26,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
@@ -81,26 +83,17 @@ public class PatientReportPageController {
 //               load the image file
                 File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), ROOT);
                 File imgFile = new File(imgDir, obs.getValueText());
+                model.addAttribute("fileName",imgFile.getName());
                 Image img = null;
                 BufferedImage image = null;
                 try {
-//                    ImageIO.scanForPlugins();
-//                    Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
-//                    BufferedImage imagetry = ImageIO.read(imgFile);
-
-//                    image = getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
+                    ImageIO.scanForPlugins();
+                    Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
+                    BufferedImage imagetry = ImageIO.read(imgFile);
+                    image = getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
                     byte[] content = Files.readAllBytes(imgFile.toPath());
-                    System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                    System.out.println(content.length);
-                    System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                     String contentType = "application/dicom";
                     toLoad = new MockMultipartFile(imgFile.getName(), imgFile.getName(), contentType, content);
-                    System.out.println(toLoad);
-                    System.out.println("=============================================================================");
-                    System.out.println(toLoad.getName());
-                    System.out.println(toLoad.getContentType());
-                    System.out.println(toLoad.getSize());
-                    System.out.println(toLoad.getOriginalFilename());
                 } catch (IOException e) {
                     System.out.println("\nError: couldn't read dicom image!" + e.getMessage());
                 } catch (Exception e) {
@@ -132,5 +125,4 @@ public class PatientReportPageController {
         }
         return buff;
     }
-
 }
