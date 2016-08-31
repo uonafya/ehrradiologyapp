@@ -64,6 +64,7 @@ public class PatientReportPageController {
         model.addAttribute("name", patient.getNames());
         model.addAttribute("category", patient.getAttribute(14));
         model.addAttribute("previousVisit", hcs.getLastVisitTime(patient));
+        model.addAttribute("_100126232", "");
         if (patient.getAttribute(43) == null) {
             model.addAttribute("fileNumber", "");
         } else if (StringUtils.isNotBlank(patient.getAttribute(43).getValue())) {
@@ -100,6 +101,9 @@ public class PatientReportPageController {
                     e.printStackTrace();
                 }
                 model.addAttribute("imgFileRaw", toLoad);
+            }
+            else {
+                model.addAttribute("imgFileRaw", "");
             }
         }
         return null;

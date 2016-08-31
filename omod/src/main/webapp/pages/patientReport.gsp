@@ -393,8 +393,9 @@
         var imageFile = "${imgFileRaw}";
         console.log(imageFile);
 
-
-        loadAndViewImage(imageFile);
+        if (!imageFile) {
+        	loadAndViewImage(imageFile);
+            }
 
         jq('#selectFile').on('change', function (e) {
             // Add the file to the cornerstoneFileImageLoader and get unique
