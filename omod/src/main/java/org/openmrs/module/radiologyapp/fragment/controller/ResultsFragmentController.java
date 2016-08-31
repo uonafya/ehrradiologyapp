@@ -3,8 +3,12 @@ package org.openmrs.module.radiologyapp.fragment.controller;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hospitalcore.PatientQueueService;
 import org.openmrs.module.hospitalcore.RadiologyService;
+import org.openmrs.module.hospitalcore.model.OpdPatientQueue;
+import org.openmrs.module.hospitalcore.model.OpdPatientQueueLog;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
 import org.openmrs.module.hospitalcore.util.TestModel;
@@ -24,7 +28,6 @@ import java.util.*;
  *         Created on 7/20/2016.
  */
 public class ResultsFragmentController {
-
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     public void controller() {
@@ -69,6 +72,5 @@ public class ResultsFragmentController {
         return SimpleObject.fromCollection(allObs,ui,"concept.conceptId","concept.name","valueCoded.name","valueText");
 
     }
-
 
 }
