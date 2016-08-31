@@ -10,8 +10,11 @@ import org.openmrs.*;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hospitalcore.BillingConstants;
+import org.openmrs.module.hospitalcore.PatientQueueService;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.form.RadiologyForm;
+import org.openmrs.module.hospitalcore.model.OpdPatientQueue;
+import org.openmrs.module.hospitalcore.model.OpdPatientQueueLog;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
 import org.openmrs.module.hospitalcore.util.GlobalPropertyUtil;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
@@ -28,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +43,7 @@ import java.util.*;
  *         Created on 7/13/2016.
  */
 public class RadiationResultsFragmentController {
+	private static final Integer RADIOLOGY_CONCEPT_ID = 2395;
     public static final String ROOT = "complex_obs";
     private static final Logger log = LoggerFactory.getLogger(RadiationResultsFragmentController.class);
 
@@ -126,6 +131,14 @@ public class RadiationResultsFragmentController {
                     System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
                     log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
                 }
+                
+        		enc = Context.getEncounterService().saveEncounter(enc);
+        		
+        		test.setEncounter(enc);
+        		test = rs.saveRadiologyTest(test);
+        		rs.completeTest(test);
+               
+        		this.sendPatientToOpdQueue(enc);
 
             }
 
@@ -249,6 +262,49 @@ public class RadiationResultsFragmentController {
         }
         return obs;
     }
+
+	private void sendPatientToOpdQueue(Encounter enc) {
+		Patient patient = enc.getPatient();
+		PatientQueueService queueService = Context.getService(PatientQueueService.class);
+		Concept referralConcept = Context.getConceptService().getConcept(RADIOLOGY_CONCEPT_ID);
+		Encounter queueEncounter = queueService.getLastOPDEncounter(enc.getPatient());
+		OpdPatientQueueLog patientQueueLog =queueService.getOpdPatientQueueLogByEncounter(queueEncounter);
+		if (patientQueueLog == null) {
+			return;
+		}
+		Concept selectedOPDConcept = patientQueueLog.getOpdConcept();
+		String selectedCategory = patientQueueLog.getCategory();
+		String visitStatus = patientQueueLog.getVisitStatus();
+
+		OpdPatientQueue patientInQueue = queueService.getOpdPatientQueue(
+				patient.getPatientIdentifier().getIdentifier(), selectedOPDConcept.getConceptId());
+
+		if (patientInQueue == null) {
+			patientInQueue = new OpdPatientQueue();
+			patientInQueue.setUser(Context.getAuthenticatedUser());
+			patientInQueue.setPatient(patient);
+			patientInQueue.setCreatedOn(new Date());
+			patientInQueue.setBirthDate(patient.getBirthdate());
+			patientInQueue.setPatientIdentifier(patient.getPatientIdentifier().getIdentifier());
+			patientInQueue.setOpdConcept(selectedOPDConcept);
+			patientInQueue.setTriageDataId(patientQueueLog.getTriageDataId());
+			patientInQueue.setOpdConceptName(selectedOPDConcept.getName().getName());
+			if(null!=patient.getMiddleName()) {
+				patientInQueue.setPatientName(patient.getGivenName() + " " + patient.getFamilyName() + " " + patient.getMiddleName());
+			} else {
+				patientInQueue.setPatientName(patient.getGivenName() + " " + patient.getFamilyName());
+			}
+
+			patientInQueue.setReferralConcept(referralConcept);
+			patientInQueue.setSex(patient.getGender());
+			patientInQueue.setCategory(selectedCategory);
+			patientInQueue.setVisitStatus(visitStatus);
+			queueService.saveOpdPatientQueue(patientInQueue);
+		} else {
+			patientInQueue.setReferralConcept(referralConcept);
+			queueService.saveOpdPatientQueue(patientInQueue);
+		}
+	}
 
     private Obs storeComplexValue(Encounter encounter, ConceptComplex concept, InputStream f, String title, RadiologyTest test) {
         Obs obs = getObs(encounter, concept);
