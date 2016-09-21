@@ -3,7 +3,6 @@
     ui.includeCss("radiologyapp", "radiology.css")
     ui.includeJavascript("uicommons", "moment.js")
     ui.includeJavascript("radiologyapp", "jquery.form.js")
-    ui.includeJavascript("radiologyapp", "jQuery.print.js")
     ui.includeJavascript("radiologyapp", "jq.browser.select.js")
 %>
 

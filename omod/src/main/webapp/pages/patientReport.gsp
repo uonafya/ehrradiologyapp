@@ -13,6 +13,11 @@
     ui.includeJavascript("radiologyapp", "libCharLS.js")
     ui.includeJavascript("radiologyapp", "libopenjpeg.js")
     ui.includeJavascript("radiologyapp", "uids.js")
+    ui.includeJavascript("billingui", "moment.js")
+    ui.includeJavascript("billingui", "paging.js")
+    ui.includeJavascript("billingui", "common.js")
+    ui.includeJavascript("billingui", "jquery-ui-1.8.2.custom.min.js")
+    ui.includeJavascript("billingui", "jq.print.js")
 
 
 %>
@@ -29,26 +34,38 @@
         jq('.tad').text('Last Visit: ' + moment('${previousVisit}').format('DD.MM.YYYY hh:mm') + ' HRS');
         jq("#radImage").hide();
 
-        /*jq.get('${ui.actionLink("radiologyapp", "radiationResults", "loadDicomImage")}', function (data) {
-            alert("Data Loaded: " + data);
-        });*/
+        /*jq.get('
+        ${ui.actionLink("radiologyapp", "radiationResults", "loadDicomImage")}', function (data) {
+         alert("Data Loaded: " + data);
+         });*/
     });//end of doc ready
 
-    function getDicom(fileName){
+    function getDicom(fileName) {
         jq.ajax({
             url: '${ui.actionLink("radiologyapp", "radiationResults", "loadDicomImage")}',
             data: {
-                "fileName" : fileName
+                "fileName": fileName
             },
             success: successResult(data),
             dataType: 'binary'
         });
     }
 
-    function successResult(data){
+    function successResult(data) {
         console.log(data);
     }
 
+    function printPatientReport() {
+        jq("#radReports").print({
+            globalStyles: false,
+            mediaPrint: false,
+            stylesheet: '${ui.resourceLink("referenceapplication","styles/referenceapplication.css")}',
+            iframe: false,
+            width: 600,
+            height: 700
+        });
+
+    }
 
     function loadRadiologyImage() {
         jq("#radImage").toggle();
@@ -140,83 +157,89 @@
         </ul>
     </div>
 
-    <div class="patient-header new-patient-header">
-        <div class="demographics">
-            <h1 class="name">
-                <span id="surname"></span>
-                <span id="othname"></span>
+    <div id="radReports">
 
-                <span class="gender-age">
-                    <span>
-                        <% if (patient.gender == "F") { %>
-                        Female
-                        <% } else { %>
-                        Male
-                        <% } %>
+        <div class="patient-header new-patient-header">
+            <div class="demographics">
+                <h1 class="name">
+                    <span id="surname"></span>
+                    <span id="othname"></span>
+
+                    <span class="gender-age">
+                        <span>
+                            <% if (patient.gender == "F") { %>
+                            Female
+                            <% } else { %>
+                            Male
+                            <% } %>
+                        </span>
+                        <span id="agename"></span>
+
                     </span>
-                    <span id="agename"></span>
+                </h1>
 
-                </span>
-            </h1>
+                <br/>
 
-            <br/>
+                <div id="stacont" class="status-container">
+                    <span class="status active"></span>
+                    Visit Status
+                </div>
 
-            <div id="stacont" class="status-container">
-                <span class="status active"></span>
-                Visit Status
+                <div class="tag">Outpatient ${fileNumber}</div>
+
+                <div class="tad">Last Visit</div>
             </div>
 
-            <div class="tag">Outpatient ${fileNumber}</div>
+            <div class="identifiers">
+                <em>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Patient ID</em>
+                <span>${patient.getPatientIdentifier()}</span>
+                <br>
 
-            <div class="tad">Last Visit</div>
-        </div>
-
-        <div class="identifiers">
-            <em>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Patient ID</em>
-            <span>${patient.getPatientIdentifier()}</span>
-            <br>
-
-            <div class="catg">
-                <i class="icon-tags small" style="font-size: 16px"></i><small>Category:</small> ${category}
+                <div class="catg">
+                    <i class="icon-tags small" style="font-size: 16px"></i><small>Category:</small> ${category}
+                </div>
             </div>
-        </div>
 
-        <div class="close"></div>
+            <div class="close"></div>
+        </div>
+        <table id="patient-report" style="margin-top: 5px">
+            <thead>
+            <tr>
+                <th>Test</th>
+                <th>Note</th>
+                <th>Film Given</th>
+                <th>Film Size</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr style="font-size: 14px;">
+                <td align="center">${radiologyTest}</td>
+                <td align="center">${_2539}</td>
+                <td align="center">${_2495}</td>
+                <td align="center">${_3710}</td>
+                <td align="center">
+                    <a title="View Image"
+                       onclick="javascript:loadRadiologyImage()"><i
+                            class="icon-picture small"></i></a>
+
+                    <a title="Print Report"
+                       onclick="javascript:printPatientReport()"><i
+                            class="icon-print small"></i></a>
+
+                </td>
+            </tr>
+
+            <tr id="radImage">
+
+            </tr>
+            </tbody>
+        </table>
     </div>
+
 </div>
 
-
-
-<table id="patient-report" style="margin-top: 5px">
-    <thead>
-    <tr>
-        <th>Test</th>
-        <th>Note</th>
-        <th>Film Given</th>
-        <th>Film Size</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <tr style="font-size: 14px;">
-        <td align="center">${radiologyTest}</td>
-        <td align="center">${_2539}</td>
-        <td align="center">${_2495}</td>
-        <td align="center">${_3710}</td>
-        <td align="center">
-            <a title="View Image"
-               onclick="javascript:loadRadiologyImage()"><i
-                    class="icon-picture small"></i></a>
-        </td>
-    </tr>
-
-    <tr id="radImage">
-        <td align="center" colspan="2">${_100126232}</td>
-        <td align="center" colspan="3">${imgFileRaw}</td>
-    </tr>
-    </tbody>
-</table>
 
 <div class="container">
     <div id="loadProgress">Image Load Progress:</div>
@@ -236,31 +259,6 @@
                      style="width:512px;height:512px;top:0px;left:0px; position:absolute">
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-6">
-            <span>Transfer Syntax:</span><span id="transferSyntax"></span><br>
-            <span>SOP Class:</span><span id="sopClass"></span><br>
-            <span>Samples Per Pixel:</span><span id="samplesPerPixel"></span><br>
-            <span>Photometric Interpretation:</span><span id="photometricInterpretation"></span><br>
-            <span>Number Of Frames:</span><span id="numberOfFrames"></span><br>
-            <span>Planar Configuration:</span><span id="planarConfiguration"></span><br>
-            <span>Rows:</span><span id="rows"></span><br>
-            <span>Columns:</span><span id="columns"></span><br>
-            <span>Pixel Spacing:</span><span id="pixelSpacing"></span><br>
-            <span>Bits Allocated:</span><span id="bitsAllocated"></span><br>
-            <span>Bits Stored:</span><span id="bitsStored"></span><br>
-            <span>High Bit:</span><span id="highBit"></span><br>
-            <span>Pixel Representation:</span><span id="pixelRepresentation"></span><br>
-            <span>WindowCenter:</span><span id="windowCenter"></span><br>
-            <span>WindowWidth:</span><span id="windowWidth"></span><br>
-            <span>RescaleIntercept:</span><span id="rescaleIntercept"></span><br>
-            <span>RescaleSlope:</span><span id="rescaleSlope"></span><br>
-            <span>Basic Offset Table Entries:</span><span id="basicOffsetTable"></span><br>
-            <span>Fragments:</span><span id="fragments"></span><br>
-            <span>Max Stored Pixel Value:</span><span id="minStoredPixelValue"></span><br>
-            <span>Min Stored Pixel Value:</span><span id="maxStoredPixelValue"></span><br>
-            <span>Load Time:</span><span id="loadTime"></span><br>
         </div>
     </div>
 </div>
@@ -348,31 +346,6 @@
                 }
                 return value + (value === 0 ? ' (pixel)' : ' (plane)');
             }
-
-            jq('#transferSyntax').text(getTransferSyntax());
-            jq('#sopClass').text(getSopClass());
-            jq('#samplesPerPixel').text(image.data.uint16('x00280002'));
-            jq('#photometricInterpretation').text(image.data.string('x00280004'));
-            jq('#numberOfFrames').text(image.data.string('x00280008'));
-            jq('#planarConfiguration').text(getPlanarConfiguration());
-            jq('#rows').text(image.data.uint16('x00280010'));
-            jq('#columns').text(image.data.uint16('x00280011'));
-            jq('#pixelSpacing').text(image.data.string('x00280030'));
-            jq('#bitsAllocated').text(image.data.uint16('x00280100'));
-            jq('#bitsStored').text(image.data.uint16('x00280101'));
-            jq('#highBit').text(image.data.uint16('x00280102'));
-            jq('#pixelRepresentation').text(getPixelRepresentation());
-            jq('#windowCenter').text(image.data.string('x00281050'));
-            jq('#windowWidth').text(image.data.string('x00281051'));
-            jq('#rescaleIntercept').text(image.data.string('x00281052'));
-            jq('#rescaleSlope').text(image.data.string('x00281053'));
-            jq('#basicOffsetTable').text(image.data.elements.x7fe00010.basicOffsetTable ? image.data.elements.x7fe00010.basicOffsetTable.length : '');
-            jq('#fragments').text(image.data.elements.x7fe00010.fragments ? image.data.elements.x7fe00010.fragments.length : '');
-            jq('#minStoredPixelValue').text(image.minPixelValue);
-            jq('#maxStoredPixelValue').text(image.maxPixelValue);
-            var end = new Date().getTime();
-            var time = end - start;
-            jq('#loadTime').text(time + "ms");
         }, function (err) {
             alert(err);
         });
@@ -390,12 +363,7 @@
 
         var element = jq('#dicomImage').get(0);
         cornerstone.enable(element);
-        var imageFile = "${imgFileRaw}";
-        console.log(imageFile);
 
-        if (!imageFile) {
-        	loadAndViewImage(imageFile);
-            }
 
         jq('#selectFile').on('change', function (e) {
             // Add the file to the cornerstoneFileImageLoader and get unique
