@@ -10,7 +10,6 @@ import org.openmrs.module.appui.UiSessionContext;
 import org.openmrs.module.hospitalcore.HospitalCoreService;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
-import org.openmrs.module.referenceapplication.ReferenceApplicationWebConstants;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
@@ -45,8 +44,8 @@ public class PatientReportPageController {
             PageModel model, @RequestParam(value = "encounterId") Integer encounterId,
             UiUtils ui,
             PageRequest pageRequest) {
-        pageRequest.getSession().setAttribute(ReferenceApplicationWebConstants.SESSION_ATTRIBUTE_REDIRECT_URL, ui.thisUrl());
-        sessionContext.requireAuthentication();
+        /*pageRequest.getSession().setAttribute(ReferenceApplicationWebConstants.SESSION_ATTRIBUTE_REDIRECT_URL, ui.thisUrl());
+        sessionContext.requireAuthentication();*/
         Boolean isPriviledged = Context.hasPrivilege("Access Laboratory");
         if (!isPriviledged) {
             return "redirect: index.htm";

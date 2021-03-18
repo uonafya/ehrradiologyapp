@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.openmrs.module</groupId>
         <artifactId>radiologyapp</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>radiologyapp-omod</artifactId>
@@ -46,10 +46,10 @@
             <artifactId>hospitalcore-api</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>referenceapplication-omod</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
@@ -59,6 +59,10 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>appui-omod</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>kenyaui-api</artifactId>
         </dependency>
 
         <!-- End OpenMRS modules -->

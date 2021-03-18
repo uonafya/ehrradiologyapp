@@ -7,7 +7,7 @@
 	<name>${project.parent.name}</name>
 	<version>${project.parent.version}</version>
 	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
-	<author>Victor</author>
+	<author>BeSpoke(Updated by HealthIT)</author>
 	<description>
 		${project.parent.description}
 	</description>
@@ -26,13 +26,13 @@
 			org.openmrs.module.uilibrary
 		</require_module>
 
-		<require_module version="1.5.1">
+		<require_module version="1.0.0-SNAPSHOT">
 			org.openmrs.module.hospitalcore
 		</require_module>
 
-		<require_module version="1.0.1">
+		<!--<require_module version="1.0.1">
 			org.openmrs.module.referenceapplication
-		</require_module>
+		</require_module>-->
 	</require_modules>
 	<!-- / Required Modules -->
 	
