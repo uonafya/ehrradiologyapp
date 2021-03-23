@@ -30,10 +30,14 @@
 			org.openmrs.module.hospitalcore
 		</require_module>
 
+		<require_module>org.openmrs.module.ehrconfigs</require_module>
 		<!--<require_module version="1.0.1">
 			org.openmrs.module.referenceapplication
 		</require_module>-->
 	</require_modules>
+<aware_of_modules>
+<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+</aware_of_modules>
 	<!-- / Required Modules -->
 	
 	<!-- Module Activator -->

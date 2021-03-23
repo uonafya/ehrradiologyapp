@@ -62,7 +62,7 @@ td a:hover{
 }
 
 #main-div .show-icon {
-    background: rgba(0, 0, 0, 0) url("../images/radiology.png") no-repeat scroll 0 0 / 100% auto;
+    background: rgba(0, 0, 0, 0) url("../images/apps/radiology.png") no-repeat scroll 0 0 / 100% auto;
     display: inline-block;
     float: right;
     height: 60px;
