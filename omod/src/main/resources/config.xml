@@ -7,7 +7,7 @@
 	<name>${project.parent.name}</name>
 	<version>${project.parent.version}</version>
 	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
-	<author>BeSpoke(Updated by HealthIT)</author>
+	<author>HealthIT</author>
 	<description>
 		${project.parent.description}
 	</description>
@@ -18,22 +18,24 @@
 	
 	<!-- Required Modules -->
 	<require_modules>
-		<require_module version="3.3.1">
-			org.openmrs.module.uiframework
-		</require_module>
+		<require_module>org.openmrs.module.uiframework</require_module>
 
-		<require_module version="2.0.4">
-			org.openmrs.module.uilibrary
-		</require_module>
+		<require_module>org.openmrs.module.uilibrary</require_module>
 
-		<require_module version="1.0.0-SNAPSHOT">
-			org.openmrs.module.hospitalcore
-		</require_module>
+		<require_module>org.openmrs.module.hospitalcore</require_module>
 
 		<require_module>org.openmrs.module.ehrconfigs</require_module>
-		<!--<require_module version="1.0.1">
-			org.openmrs.module.referenceapplication
-		</require_module>-->
+
+		<require_module>org.openmrs.module.kenyacore</require_module>
+
+		<require_module>org.openmrs.module.kenyaui</require_module>
+
+		<require_module>org.openmrs.module.metadatasharing</require_module>
+
+		<require_module>org.openmrs.module.metadatadeploy</require_module>
+
+		<require_module>org.openmrs.module.kenyaemr</require_module>
+
 	</require_modules>
 <aware_of_modules>
 <aware_of_module>org.openmrs.module.legacyui</aware_of_module>

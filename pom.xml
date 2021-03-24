@@ -13,7 +13,7 @@
 
     <developers>
         <developer>
-            <name>BeSpoke</name>
+            <name>HealthIT</name>
         </developer>
     </developers>
 
@@ -39,6 +39,7 @@
         <kenyacoreVersion>2.4.1</kenyacoreVersion>
         <kenyauiVersion>2.1.1</kenyauiVersion>
         <kenyaemrVersion>17.0.3</kenyaemrVersion>
+        <metadatadeployVersion>1.2</metadatadeployVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -61,7 +62,7 @@
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>uiframework-api</artifactId>
-                <version>3.3.1</version>
+                <version>3.8</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -112,6 +113,19 @@
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>appui-omod</artifactId>
                 <version>1.4</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>metadatadeploy-api</artifactId>
+                <version>${metadatadeployVersion}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>kenyaemr-api</artifactId>
+                <version>${kenyaemrVersion}</version>
                 <scope>provided</scope>
             </dependency>
 

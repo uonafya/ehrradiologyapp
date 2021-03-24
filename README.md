@@ -1,2 +1,2 @@
 # radiology-app 
-- AfyaEHMS module, updated by HealthIT
+- EHR module, updated by HealthIT
