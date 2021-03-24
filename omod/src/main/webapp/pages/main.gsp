@@ -228,13 +228,12 @@ form input[type="checkbox"] {
         <div class="example">
             <ul id="breadcrumbs">
                 <li>
-                    <a href="${ui.pageLink('referenceapplication', 'home')}">
-                        <i class="icon-home small"></i></a>
-                </li>
+                    <i class="icon-home small"></i>
+                </li>-
 
                 <li>
                     <i class="icon-chevron-right link"></i>
-                    Radiology
+                    Radiology App
                 </li>
             </ul>
         </div>
