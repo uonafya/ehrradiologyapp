@@ -9,6 +9,7 @@ import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
 import org.openmrs.module.hospitalcore.util.TestModel;
+import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.module.radiologyapp.util.RadiologyAppUtil;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.FileDownload;
@@ -22,10 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * @author Stanslaus Odhiambo
- * Created on 7/20/2016.
- */
+@AppPage("radiologyapp.main")
 public class ReportExportPageController {
     private static Logger logger = LoggerFactory.getLogger(ReportExportPageController.class);
 

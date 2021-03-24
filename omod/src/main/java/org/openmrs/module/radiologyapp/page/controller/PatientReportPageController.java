@@ -10,6 +10,7 @@ import org.openmrs.module.appui.UiSessionContext;
 import org.openmrs.module.hospitalcore.HospitalCoreService;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
+import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
@@ -36,6 +37,7 @@ import java.util.Set;
  * @author Stanslaus Odhiambo
  *         Created on 7/20/2016.
  */
+@AppPage("radiologyapp.main")
 public class PatientReportPageController {
     public static final String ROOT = "complex_obs";
 
