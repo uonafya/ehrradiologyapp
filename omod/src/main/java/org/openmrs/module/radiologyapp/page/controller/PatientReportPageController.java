@@ -48,10 +48,10 @@ public class PatientReportPageController {
             PageRequest pageRequest) {
         /*pageRequest.getSession().setAttribute(ReferenceApplicationWebConstants.SESSION_ATTRIBUTE_REDIRECT_URL, ui.thisUrl());
         sessionContext.requireAuthentication();*/
-        Boolean isPriviledged = Context.hasPrivilege("Access Laboratory");
+        /*Boolean isPriviledged = Context.hasPrivilege("Access Laboratory");
         if (!isPriviledged) {
             return "redirect: index.htm";
-        }
+        }*/
         RadiologyService rs = Context.getService(RadiologyService.class);
         RadiologyTest radiologyTest = rs.getRadiologyTestById(testId);
         Patient patient = radiologyTest.getPatient();
