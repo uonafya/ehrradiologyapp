@@ -15,14 +15,16 @@ import org.openmrs.ui.framework.page.PageRequest;
 
 @AppPage("radiologyapp.main")
 public class MainPageController {
-	
+
+	public static final String SESSION_ATTRIBUTE_REDIRECT_URL = "_REFERENCE_APPLICATION_REDIRECT_URL_";
+
 	public void get(
 			UiSessionContext sessionContext,
 			PageModel model,
 			PageRequest pageRequest,
 			UiUtils ui) {
-		/*pageRequest.getSession().setAttribute(ReferenceApplicationWebConstants.SESSION_ATTRIBUTE_REDIRECT_URL,ui.thisUrl());
-		sessionContext.requireAuthentication();*/
+		pageRequest.getSession().setAttribute(SESSION_ATTRIBUTE_REDIRECT_URL,ui.thisUrl());
+		sessionContext.requireAuthentication();
 		
 		RadiologyService radiologyService = Context.getService(RadiologyService.class);
 		RadiologyDepartment department = radiologyService.getCurrentRadiologyDepartment();

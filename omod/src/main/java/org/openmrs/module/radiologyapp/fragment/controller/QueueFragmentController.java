@@ -43,6 +43,7 @@ public class QueueFragmentController {
             @RequestParam(value = "investigation", required = false) Integer investigationId,
             @RequestParam(value = "currentPage", required = false) Integer currentPage,
             UiUtils ui) {
+
         RadiologyService radiologyService = Context.getService(RadiologyService.class);
         Concept investigation = Context.getConceptService().getConcept(investigationId);
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
