@@ -16,15 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
-
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by USER on 2/3/2016.
+ * Created by heathIT
  */
 public class QueueFragmentController {
     private static Logger logger = LoggerFactory.getLogger(QueueFragmentController.class);
@@ -64,6 +61,8 @@ public class QueueFragmentController {
 
             if (currentPage == null)
                 currentPage = 1;
+            System.out.println("The allowed tests are >>>"+allowableTests);
+
             List<Order> orders = radiologyService.getOrders(orderDate, phrase, allowableTests,
                     currentPage);
             List<TestModel> tests = RadiologyUtil.generateModelsFromOrders(
