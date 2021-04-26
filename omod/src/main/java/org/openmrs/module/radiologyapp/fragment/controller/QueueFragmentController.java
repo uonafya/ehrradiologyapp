@@ -61,7 +61,6 @@ public class QueueFragmentController {
 
             if (currentPage == null)
                 currentPage = 1;
-            System.out.println("The allowed tests are >>>"+allowableTests);
 
             List<Order> orders = radiologyService.getOrders(orderDate, phrase, allowableTests,
                     currentPage);
