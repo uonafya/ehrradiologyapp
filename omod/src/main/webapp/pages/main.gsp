@@ -1,24 +1,17 @@
 <%
-    ui.decorateWith("kenyaemr", "standardPage")
+    ui.decorateWith("appui", "standardEmrPage", [title: "Radiology"])
 
-    ui.includeJavascript("ehrcashier", "paging.js")
     ui.includeJavascript("ehrconfigs", "moment.js")
-    ui.includeJavascript("ehrcashier", "common.js")
-    ui.includeJavascript("ehrcashier", "jquery.PrintArea.js")
+    ui.includeJavascript("radiologyapp", "jquery.form.js")
+    ui.includeJavascript("radiologyapp", "jq.browser.select.js")
     ui.includeJavascript("ehrconfigs", "knockout-3.4.0.js")
     ui.includeJavascript("ehrconfigs", "jquery-ui-1.9.2.custom.min.js")
-    ui.includeJavascript("ehrconfigs", "underscore-min.js")
     ui.includeJavascript("ehrconfigs", "emr.js")
     ui.includeJavascript("ehrconfigs", "jquery.simplemodal.1.4.4.min.js")
 
     ui.includeCss("ehrconfigs", "jquery-ui-1.9.2.custom.min.css")
-    ui.includeCss("ehrcashier", "paging.css")
     ui.includeCss("ehrconfigs", "referenceapplication.css")
-
     ui.includeCss("radiologyapp", "radiology.css")
-    ui.includeJavascript("uicommons", "moment.js")
-    ui.includeJavascript("radiologyapp", "jquery.form.js")
-    ui.includeJavascript("radiologyapp", "jq.browser.select.js")
 %>
 
 <script>
@@ -41,22 +34,22 @@
         });
 
         jq("#inline-tabs li").click(function () {
-            if (jq(this).attr("aria-controls") == "queue") {
+            if (jq(this).attr("aria-controls") === "queue") {
                 jq('#refresh a').html('<i class="icon-refresh"></i> Get Patients');
                 jq('#refresh a').show(500);
                 getQueueData(false);
             }
-            else if (jq(this).attr("aria-controls") == "worklist") {
+            else if (jq(this).attr("aria-controls") === "worklist") {
                 jq('#refresh a').html('<i class="icon-refresh"></i> Get Worklist');
                 jq('#refresh a').show(500);
                 getWorklistData(false);
             }
-            else if (jq(this).attr("aria-controls") == "results") {
+            else if (jq(this).attr("aria-controls") === "results") {
                 jq('#refresh a').html('<i class="icon-refresh"></i> Get Results');
                 jq('#refresh a').show(500);
                 getResultsData(false);
             }
-            else if (jq(this).attr("aria-controls") == "status") {
+            else if (jq(this).attr("aria-controls") === "status") {
                 jq('#refresh a').hide(500);
                 getBillableServices();
             }

@@ -18,7 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * Created by heathIT
@@ -46,7 +52,6 @@ public class QueueFragmentController {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
         Date orderDate = null;
         List<SimpleObject> testOrdersInQueue = new ArrayList<SimpleObject>();
-
 		try {
             orderDate = dateFormatter.parse(orderDateString);
             Map<Concept, Set<Concept>> allowedInvestigations = RadiologyAppUtil.getAllowedInvestigations();
@@ -69,7 +74,7 @@ public class QueueFragmentController {
             testOrdersInQueue = SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "testName", "orderId","status");
         } catch (ParseException e) {
             e.printStackTrace();
-            logger.error("Error when parsing order date!", e.getMessage());
+            logger.error("Error when parsing order date!"+e.getMessage());
         }
         return testOrdersInQueue;
     }

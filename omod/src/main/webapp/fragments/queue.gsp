@@ -1,8 +1,3 @@
-<%
-    ui.includeCss("uicommons", "datatables/dataTables_jui.css")
-    ui.includeJavascript("patientqueueapp", "jquery.dataTables.min.js")
-    ui.includeJavascript("radiologyapp", "ko-utils.js");
-%>
 <script>
 	var queueData = new QueueData();
 	var radiologyQueueTable;
@@ -16,7 +11,7 @@
 		scheduleDate = jq("#reschedule-date-field");
 		radiologyQueueTable = jq('#radiology-queue-results-table');
 		var testDetails = { details : ko.observable(details) };
-		
+		getQueueData(false);
         var rescheduleDialog = emr.setupConfirmationDialog({
 			dialogOpts: {
 				overlayClose: false,
@@ -82,7 +77,7 @@
             var orderId = jq(this).data('orderId');
             jq("#reschedule-form #order").val(orderId);
             var details = ko.utils.arrayFirst(queueData.tests(), function(item) {
-                return item.orderId == orderId;
+                return item.orderId === orderId;
             });
             testDetails.details(details);
             rescheduleDialog.show();
@@ -111,7 +106,7 @@
 			} else {
 				queueData.tests(data);
 			}
-			
+
 			initializeDataTable(jq('#queue-phrase').val());
 		});
 	}
