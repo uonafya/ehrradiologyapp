@@ -6,6 +6,7 @@ import org.openmrs.Order;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.model.RadiologyDepartment;
+import org.openmrs.module.hospitalcore.util.RadiologyConstants;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
 import org.openmrs.module.hospitalcore.util.TestModel;
 import org.openmrs.module.radiologyapp.util.RadiologyAppUtil;
@@ -69,8 +70,17 @@ public class QueueFragmentController {
 
             List<Order> orders = radiologyService.getOrders(orderDate, phrase, allowableTests,
                     currentPage);
-            List<TestModel> tests = RadiologyUtil.generateModelsFromOrders(
+            List<TestModel> allTestOrders = RadiologyUtil.generateModelsFromOrders(
                     orders, allowedInvestigations);
+            List<TestModel> tests = new ArrayList<TestModel>();
+
+            for (TestModel testModel : allTestOrders) {
+                //1.pick investigations accepted but pending results input 2. Also Pick those not yet accepted [ need to find out if there is need to show rejected investigations in this queue]
+                if (testModel.getStatus() == null || testModel.getStatus().isEmpty() || testModel.getStatus().equals(RadiologyConstants.TEST_STATUS_ACCEPTED)) {
+                    tests.add(testModel);
+                }
+            }
+
             testOrdersInQueue = SimpleObject.fromCollection(tests, ui, "startDate", "patientIdentifier", "patientName", "gender", "age", "testName", "orderId","status");
         } catch (ParseException e) {
             e.printStackTrace();
