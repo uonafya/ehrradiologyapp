@@ -112,7 +112,7 @@ public class RadiationResultsFragmentController {
                         File f = new File(imgDir, file.getOriginalFilename());
                         Files.copy(stream, f.toPath());
 
-                        Concept imageConcept = Context.getConceptService().getConceptByUuid("f53f4215-a17b-4516-b33f-854ffe663f61");
+                        Concept imageConcept = Context.getConceptService().getConceptByUuid("bb6055a3-7310-42a3-a752-8d5f1a5d4ee1"); //100126232 on afyaehms
                         obs = insertValue(enc, imageConcept, f.getName(), test);
                         enc.addObs(obs);
                         Context.getEncounterService().saveEncounter(enc);
