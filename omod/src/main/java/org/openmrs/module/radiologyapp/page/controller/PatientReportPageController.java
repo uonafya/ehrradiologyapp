@@ -5,12 +5,14 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appui.UiSessionContext;
 import org.openmrs.module.hospitalcore.HospitalCoreService;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
 import org.openmrs.module.kenyaui.annotation.AppPage;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
@@ -52,6 +54,8 @@ public class PatientReportPageController {
         if (!isPriviledged) {
             return "redirect: index.htm";
         }*/
+        PersonAttributeType personAttributeType14 = MetadataUtils.existing(PersonAttributeType.class, "09cd268a-f0f5-11ea-99a8-b3467ddbf779");
+        PersonAttributeType personAttributeType43 = MetadataUtils.existing(PersonAttributeType.class, "858781dc-282f-11eb-8741-8ff5ddd45b7c");
         RadiologyService rs = Context.getService(RadiologyService.class);
         RadiologyTest radiologyTest = rs.getRadiologyTestById(testId);
         Patient patient = radiologyTest.getPatient();
@@ -63,13 +67,13 @@ public class PatientReportPageController {
         model.addAttribute("age", patient.getAge());
         model.addAttribute("gender", patient.getGender());
         model.addAttribute("name", patient.getNames());
-        model.addAttribute("category", patient.getAttribute(14));
+        model.addAttribute("category", patient.getAttribute(personAttributeType14));
         model.addAttribute("previousVisit", hcs.getLastVisitTime(patient));
         model.addAttribute("_100126232", "");
-        if (patient.getAttribute(43) == null) {
+        if (patient.getAttribute(personAttributeType43) == null) {
             model.addAttribute("fileNumber", "");
-        } else if (StringUtils.isNotBlank(patient.getAttribute(43).getValue())) {
-            model.addAttribute("fileNumber", "(File: " + patient.getAttribute(43) + ")");
+        } else if (StringUtils.isNotBlank(patient.getAttribute(personAttributeType43).getValue())) {
+            model.addAttribute("fileNumber", "(File: " + patient.getAttribute(personAttributeType43) + ")");
         } else {
             model.addAttribute("fileNumber", "");
         }
@@ -80,7 +84,7 @@ public class PatientReportPageController {
         for (Obs obs : allObs) {
             model.addAttribute("_" + obs.getConcept().getConceptId(),
                     obs.getValueText() == null ? obs.getValueCoded().getName().getName() : obs.getValueText());
-            if (obs.getConcept().getConceptId() == 100126232) {
+            if (obs.getConcept().getConceptId() == 1000169) {
                 MultipartFile toLoad = null;
 //               load the image file
                 File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), ROOT);

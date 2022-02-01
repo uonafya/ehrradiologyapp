@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.*;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ehrconfigs.utils.EhrConfigsUtils;
 import org.openmrs.module.hospitalcore.BillingConstants;
 import org.openmrs.module.hospitalcore.PatientQueueService;
 import org.openmrs.module.hospitalcore.RadiologyService;
@@ -43,7 +44,7 @@ import java.util.*;
  *         Created on 7/13/2016.
  */
 public class RadiationResultsFragmentController {
-	private static final Integer RADIOLOGY_CONCEPT_ID = 2395;
+	private static final Integer RADIOLOGY_CONCEPT_ID = 160463;
     public static final String ROOT = "complex_obs";
     private static final Logger log = LoggerFactory.getLogger(RadiationResultsFragmentController.class);
 
@@ -71,10 +72,10 @@ public class RadiationResultsFragmentController {
         Location loc = Context.getLocationService().getLocation(1);
         enc.setLocation(loc);
         enc.setPatient(test.getPatient());
-        enc.setPatientId(test.getPatient().getId());
+        enc.setPatient(test.getPatient());
         enc.setEncounterType(encounterType);
         enc.setVoided(false);
-        enc.setProvider(Context.getAuthenticatedUser().getPerson());
+        enc.setProvider(EhrConfigsUtils.getDefaultEncounterRole(),EhrConfigsUtils.getProvider(Context.getAuthenticatedUser().getPerson()));
         enc.setUuid(UUID.randomUUID().toString());
         enc.setEncounterDatetime(new Date());
         enc = Context.getEncounterService().saveEncounter(enc);
