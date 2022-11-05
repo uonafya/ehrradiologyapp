@@ -36,8 +36,8 @@ import java.util.Set;
 
 
 /**
- * @author Stanslaus Odhiambo
- *         Created on 7/20/2016.
+ * @author HealthIT
+ *
  */
 @AppPage("radiologyapp.main")
 public class PatientReportPageController {
@@ -48,12 +48,6 @@ public class PatientReportPageController {
             PageModel model, @RequestParam(value = "encounterId") Integer encounterId,
             UiUtils ui,
             PageRequest pageRequest) {
-        /*pageRequest.getSession().setAttribute(ReferenceApplicationWebConstants.SESSION_ATTRIBUTE_REDIRECT_URL, ui.thisUrl());
-        sessionContext.requireAuthentication();*/
-        /*Boolean isPriviledged = Context.hasPrivilege("Access Laboratory");
-        if (!isPriviledged) {
-            return "redirect: index.htm";
-        }*/
         PersonAttributeType personAttributeType14 = MetadataUtils.existing(PersonAttributeType.class, "09cd268a-f0f5-11ea-99a8-b3467ddbf779");
         PersonAttributeType personAttributeType43 = MetadataUtils.existing(PersonAttributeType.class, "858781dc-282f-11eb-8741-8ff5ddd45b7c");
         RadiologyService rs = Context.getService(RadiologyService.class);
@@ -85,17 +79,21 @@ public class PatientReportPageController {
             model.addAttribute("_" + obs.getConcept().getConceptId(),
                     obs.getValueText() == null ? obs.getValueCoded().getName().getName() : obs.getValueText());
             if (obs.getConcept().getConceptId() == 1000169) {
+                System.out.println("The image is found here in obs >>"+obs.getValueText());
                 MultipartFile toLoad = null;
 //               load the image file
                 File imgDir = new File(OpenmrsUtil.getApplicationDataDirectory(), ROOT);
                 File imgFile = new File(imgDir, obs.getValueText());
                 model.addAttribute("fileName",imgFile.getName());
+                System.out.println("The file name is as follows>>"+imgFile.getName());
                 Image img = null;
                 BufferedImage image = null;
                 try {
                     ImageIO.scanForPlugins();
                     Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("DICOM");
+                    System.out.println("The dicom plugin is >>"+iter);
                     BufferedImage imagetry = ImageIO.read(imgFile);
+                    System.out.println("Imegtry is >>"+imagetry +" and Image to be loaded is >>"+imgFile);
                     image = getPixelDataAsBufferedImage(IOUtils.toByteArray(new FileInputStream(imgFile)));
                     byte[] content = Files.readAllBytes(imgFile.toPath());
                     String contentType = "application/dicom";

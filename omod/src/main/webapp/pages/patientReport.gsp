@@ -1,24 +1,15 @@
 <%
     ui.decorateWith("kenyaemr", "standardPage")
 
-    ui.includeJavascript("ehrcashier", "paging.js")
+    ui.includeJavascript("ehrconfigs", "paging.js")
     ui.includeJavascript("ehrconfigs", "moment.js")
-    ui.includeJavascript("ehrcashier", "common.js")
-    ui.includeJavascript("ehrcashier", "jquery.PrintArea.js")
+    ui.includeJavascript("radiologyapp", "common.js")
+    ui.includeJavascript("ehrconfigs", "jquery.PrintArea.js")
     ui.includeJavascript("ehrconfigs", "knockout-3.4.0.js")
     ui.includeJavascript("ehrconfigs", "jquery-ui-1.9.2.custom.min.js")
     ui.includeJavascript("ehrconfigs", "underscore-min.js")
     ui.includeJavascript("ehrconfigs", "emr.js")
     ui.includeJavascript("ehrconfigs", "jquery.simplemodal.1.4.4.min.js")
-
-    ui.includeCss("ehrconfigs", "jquery-ui-1.9.2.custom.min.css")
-    ui.includeCss("ehrcashier", "paging.css")
-    ui.includeCss("ehrconfigs", "referenceapplication.css")
-
-    ui.includeJavascript("billingui", "moment.js")
-    ui.includeCss("radiologyapp", "cornerstone.min.css")
-    ui.includeCss("registration", "onepcssgrid.css")
-    ui.includeJavascript("radiologyapp", "moment.js")
     ui.includeJavascript("radiologyapp", "cornerstone.min.js")
     ui.includeJavascript("radiologyapp", "cornerstoneMath.js")
     ui.includeJavascript("radiologyapp", "cornerstoneTools.js")
@@ -28,11 +19,14 @@
     ui.includeJavascript("radiologyapp", "libCharLS.js")
     ui.includeJavascript("radiologyapp", "libopenjpeg.js")
     ui.includeJavascript("radiologyapp", "uids.js")
-    ui.includeJavascript("billingui", "moment.js")
-    ui.includeJavascript("billingui", "paging.js")
-    ui.includeJavascript("billingui", "common.js")
-    ui.includeJavascript("billingui", "jquery-ui-1.8.2.custom.min.js")
-    ui.includeJavascript("billingui", "jq.print.js")
+
+    ui.includeCss("ehrconfigs", "jquery-ui-1.9.2.custom.min.css")
+    ui.includeCss("ehrconfigs", "paging.css")
+    ui.includeCss("ehrconfigs", "referenceapplication.css")
+    ui.includeCss("radiologyapp", "cornerstone.min.css")
+    ui.includeCss("ehrconfigs", "onepcssgrid.css")
+
+
 
 
 %>
@@ -43,8 +37,8 @@
 
     jq(document).ready(function () {
         jq(".dashboard-tabs").tabs();
-        jq('#surname').html(stringReplace('${patient.names.familyName}') + ',<em>surname</em>');
-        jq('#othname').html(stringReplace('${patient.names.givenName}') + ' &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <em>other names</em>');
+        jq('#surname').html('${patient.names.familyName}' + ',<em>surname</em>');
+        jq('#othname').html('${patient.names.givenName}' + ' &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <em>other names</em>');
         jq('#agename').html('${patient.age} years (' + moment('${patient.birthdate}').format('DD,MMM YYYY') + ')');
         jq('.tad').text('Last Visit: ' + moment('${previousVisit}').format('DD.MM.YYYY hh:mm') + ' HRS');
         jq("#radImage").hide();
@@ -74,7 +68,7 @@
         jq("#radReports").print({
             globalStyles: false,
             mediaPrint: false,
-            stylesheet: '${ui.resourceLink("referenceapplication","styles/referenceapplication.css")}',
+            stylesheet: '${ui.resourceLink("ehrconfigs","styles/referenceapplication.css")}',
             iframe: false,
             width: 600,
             height: 700
@@ -156,7 +150,7 @@
     <div class="example">
         <ul id="breadcrumbs">
             <li>
-                <a href="${ui.pageLink('referenceapplication', 'home')}">
+                <a href="${ui.pageLink('kenyaemr', 'userHome')}">
                     <i class="icon-home small"></i></a>
             </li>
 
@@ -222,8 +216,7 @@
             <tr>
                 <th>Test</th>
                 <th>Note</th>
-                <th>Film Given</th>
-                <th>Film Size</th>
+                <th>Status</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -231,9 +224,8 @@
             <tbody>
             <tr style="font-size: 14px;">
                 <td align="center">${radiologyTest}</td>
-                <td align="center">${_2539}</td>
-                <td align="center">${_2495}</td>
-                <td align="center">${_3710}</td>
+                <td align="center">${_1000170}</td>
+                <td align="center">${_1000171}</td>
                 <td align="center">
                     <a title="View Image"
                        onclick="javascript:loadRadiologyImage()"><i

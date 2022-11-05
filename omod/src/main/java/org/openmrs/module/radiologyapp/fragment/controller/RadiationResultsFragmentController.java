@@ -6,18 +6,23 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptComplex;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.Location;
+import org.openmrs.Obs;
+import org.openmrs.Patient;
+import org.openmrs.PersonAttribute;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ehrconfigs.utils.EhrConfigsUtils;
-import org.openmrs.module.hospitalcore.BillingConstants;
 import org.openmrs.module.hospitalcore.PatientQueueService;
 import org.openmrs.module.hospitalcore.RadiologyService;
 import org.openmrs.module.hospitalcore.form.RadiologyForm;
 import org.openmrs.module.hospitalcore.model.OpdPatientQueue;
 import org.openmrs.module.hospitalcore.model.OpdPatientQueueLog;
 import org.openmrs.module.hospitalcore.model.RadiologyTest;
-import org.openmrs.module.hospitalcore.util.GlobalPropertyUtil;
 import org.openmrs.module.hospitalcore.util.RadiologyUtil;
 import org.openmrs.obs.ComplexData;
 import org.openmrs.ui.framework.SimpleObject;
@@ -32,19 +37,24 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * @author Stanslaus Odhiambo
- *         Created on 7/13/2016.
+ * @author HealthIT
+ *
  */
 public class RadiationResultsFragmentController {
-	private static final Integer RADIOLOGY_CONCEPT_ID = 160463;
+    private static final Integer RADIOLOGY_CONCEPT_ID = 160463;
     public static final String ROOT = "complex_obs";
     private static final Logger log = LoggerFactory.getLogger(RadiationResultsFragmentController.class);
 
@@ -64,8 +74,9 @@ public class RadiationResultsFragmentController {
 
         System.out.println("Test this ID " + testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
-        String encounterTypeStr = GlobalPropertyUtil.getString(BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
-        EncounterType encounterType = Context.getEncounterService().getEncounterType(encounterTypeStr);
+        //String encounterTypeStr = GlobalPropertyUtil.getString(BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
+        //String imageConceptStr = GlobalPropertyUtil.getString(RadiologyConstants.PROPRETY_RADIOLOGY_IMAGE_CONCEPT, "ec58b921-03cd-486d-89e7-71b1b0db5f31");
+        EncounterType encounterType = Context.getEncounterService().getEncounterTypeByUuid("012bb9f4-f282-11ea-a6d6-3b4fa4aefb5a");
         Encounter enc = new Encounter();
         enc.setCreator(Context.getAuthenticatedUser());
         enc.setDateCreated(new Date());
@@ -113,7 +124,7 @@ public class RadiationResultsFragmentController {
                         File f = new File(imgDir, file.getOriginalFilename());
                         Files.copy(stream, f.toPath());
 
-                        Concept imageConcept = Context.getConceptService().getConceptByUuid("bb6055a3-7310-42a3-a752-8d5f1a5d4ee1"); //100126232 on afyaehms
+                        Concept imageConcept = Context.getConceptService().getConceptByUuid("ec58b921-03cd-486d-89e7-71b1b0db5f31");
                         obs = insertValue(enc, imageConcept, f.getName(), test);
                         enc.addObs(obs);
                         Context.getEncounterService().saveEncounter(enc);
@@ -132,14 +143,14 @@ public class RadiationResultsFragmentController {
                     System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
                     log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
                 }
-                
-        		enc = Context.getEncounterService().saveEncounter(enc);
-        		
-        		test.setEncounter(enc);
-        		test = rs.saveRadiologyTest(test);
-        		rs.completeTest(test);
-               
-        		this.sendPatientToOpdQueue(enc);
+
+                enc = Context.getEncounterService().saveEncounter(enc);
+
+                test.setEncounter(enc);
+                test = rs.saveRadiologyTest(test);
+                rs.completeTest(test);
+
+                this.sendPatientToOpdQueue(enc);
 
             }
 
@@ -264,48 +275,48 @@ public class RadiationResultsFragmentController {
         return obs;
     }
 
-	private void sendPatientToOpdQueue(Encounter enc) {
-		Patient patient = enc.getPatient();
-		PatientQueueService queueService = Context.getService(PatientQueueService.class);
-		Concept referralConcept = Context.getConceptService().getConcept(RADIOLOGY_CONCEPT_ID);
-		Encounter queueEncounter = queueService.getLastOPDEncounter(enc.getPatient());
-		OpdPatientQueueLog patientQueueLog =queueService.getOpdPatientQueueLogByEncounter(queueEncounter);
-		if (patientQueueLog == null) {
-			return;
-		}
-		Concept selectedOPDConcept = patientQueueLog.getOpdConcept();
-		String selectedCategory = patientQueueLog.getCategory();
-		String visitStatus = patientQueueLog.getVisitStatus();
+    private void sendPatientToOpdQueue(Encounter enc) {
+        Patient patient = enc.getPatient();
+        PatientQueueService queueService = Context.getService(PatientQueueService.class);
+        Concept referralConcept = Context.getConceptService().getConcept(RADIOLOGY_CONCEPT_ID);
+        Encounter queueEncounter = queueService.getLastOPDEncounter(enc.getPatient());
+        OpdPatientQueueLog patientQueueLog =queueService.getOpdPatientQueueLogByEncounter(queueEncounter);
+        if (patientQueueLog == null) {
+            return;
+        }
+        Concept selectedOPDConcept = patientQueueLog.getOpdConcept();
+        String selectedCategory = patientQueueLog.getCategory();
+        String visitStatus = patientQueueLog.getVisitStatus();
 
-		OpdPatientQueue patientInQueue = queueService.getOpdPatientQueue(
-				patient.getPatientIdentifier().getIdentifier(), selectedOPDConcept.getConceptId());
+        OpdPatientQueue patientInQueue = queueService.getOpdPatientQueue(
+                patient.getPatientIdentifier().getIdentifier(), selectedOPDConcept.getConceptId());
 
-		if (patientInQueue == null) {
-			patientInQueue = new OpdPatientQueue();
-			patientInQueue.setUser(Context.getAuthenticatedUser());
-			patientInQueue.setPatient(patient);
-			patientInQueue.setCreatedOn(new Date());
-			patientInQueue.setBirthDate(patient.getBirthdate());
-			patientInQueue.setPatientIdentifier(patient.getPatientIdentifier().getIdentifier());
-			patientInQueue.setOpdConcept(selectedOPDConcept);
-			patientInQueue.setTriageDataId(patientQueueLog.getTriageDataId());
-			patientInQueue.setOpdConceptName(selectedOPDConcept.getName().getName());
-			if(null!=patient.getMiddleName()) {
-				patientInQueue.setPatientName(patient.getGivenName() + " " + patient.getFamilyName() + " " + patient.getMiddleName());
-			} else {
-				patientInQueue.setPatientName(patient.getGivenName() + " " + patient.getFamilyName());
-			}
+        if (patientInQueue == null) {
+            patientInQueue = new OpdPatientQueue();
+            patientInQueue.setUser(Context.getAuthenticatedUser());
+            patientInQueue.setPatient(patient);
+            patientInQueue.setCreatedOn(new Date());
+            patientInQueue.setBirthDate(patient.getBirthdate());
+            patientInQueue.setPatientIdentifier(patient.getPatientIdentifier().getIdentifier());
+            patientInQueue.setOpdConcept(selectedOPDConcept);
+            patientInQueue.setTriageDataId(patientQueueLog.getTriageDataId());
+            patientInQueue.setOpdConceptName(selectedOPDConcept.getName().getName());
+            if(null!=patient.getMiddleName()) {
+                patientInQueue.setPatientName(patient.getGivenName() + " " + patient.getFamilyName() + " " + patient.getMiddleName());
+            } else {
+                patientInQueue.setPatientName(patient.getGivenName() + " " + patient.getFamilyName());
+            }
 
-			patientInQueue.setReferralConcept(referralConcept);
-			patientInQueue.setSex(patient.getGender());
-			patientInQueue.setCategory(selectedCategory);
-			patientInQueue.setVisitStatus(visitStatus);
-			queueService.saveOpdPatientQueue(patientInQueue);
-		} else {
-			patientInQueue.setReferralConcept(referralConcept);
-			queueService.saveOpdPatientQueue(patientInQueue);
-		}
-	}
+            patientInQueue.setReferralConcept(referralConcept);
+            patientInQueue.setSex(patient.getGender());
+            patientInQueue.setCategory(selectedCategory);
+            patientInQueue.setVisitStatus(visitStatus);
+            queueService.saveOpdPatientQueue(patientInQueue);
+        } else {
+            patientInQueue.setReferralConcept(referralConcept);
+            queueService.saveOpdPatientQueue(patientInQueue);
+        }
+    }
 
     private Obs storeComplexValue(Encounter encounter, ConceptComplex concept, InputStream f, String title, RadiologyTest test) {
         Obs obs = getObs(encounter, concept);

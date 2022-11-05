@@ -1,283 +1,283 @@
 <script>
-    var radiologyWorklistTable = jq('#radiology-worklist-table');
-    var radiologyWorklistDataTable;
-    var worklistData, reorderDialog, reorderForm, resultsDialog;
-    var orderIdd;
-    var isXray, testId;
-    var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
-    var scanDetails = {details: ko.observable(details)};
-    var resultDetails = {details: ko.observable(details)};
-    var errorStatus = false;
-    var isFileSelected;
-    jq(function () {
+  var radiologyWorklistTable = jq('#radiology-worklist-table');
+  var radiologyWorklistDataTable;
+  var worklistData, reorderDialog, reorderForm, resultsDialog;
+  var orderIdd;
+  var isXray, testId;
+  var details = {'patientName': 'Patient Name', 'startDate': 'Start Date', 'test': {'name': 'Test Name'}};
+  var scanDetails = {details: ko.observable(details)};
+  var resultDetails = {details: ko.observable(details)};
+  var errorStatus = false;
+  var isFileSelected;
+  jq(function () {
 
-        var options = {
-            target: '#resultsForm',
-            success: showSuccessResponse,
-            error: showErrorResponse,
-            clearForm: true,
-            dataType: 'json'
-        };
+    var options = {
+      target: '#resultsForm',
+      success: showSuccessResponse,
+      error: showErrorResponse,
+      clearForm: true,
+      dataType: 'json'
+    };
 
-        jq('#resultsForm').ajaxForm(options);
+    jq('#resultsForm').ajaxForm(options);
 
 
-        radiologyWorklistTable = jq('#radiology-worklist-table');
-        worklistData = new WorklistData();
+    radiologyWorklistTable = jq('#radiology-worklist-table');
+    worklistData = new WorklistData();
 
-        initializeWorklistDataTable();
-        getWorklistData(false);
+    initializeWorklistDataTable();
+    getWorklistData(false);
 
-        jq('#worklist-order-date-display, #worklist-investigation').change(function () {
-            getWorklistData();
+    jq('#worklist-order-date-display, #worklist-investigation').change(function () {
+      getWorklistData();
+    });
+
+    jq("#worklist-phrase").on("keyup", function () {
+      var searchPhrase = jq(this).val();
+      radiologyWorklistDataTable.search(searchPhrase).draw();
+    });
+
+    jq("#print-worklist").on("click", function () {
+      jq.getJSON('${ui.actionLink("radiologyapp", "worklist", "getWorksheet")}',
+          {
+            "date": moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
+            "phrase": jq("#worklist-phrase").val(),
+            "investigation": jq("#worklist-investigation").val()
+          }
+      ).success(function (data) {
+        worksheet.items.removeAll();
+        jq.each(data, function (index, item) {
+          worksheet.items.push(item);
         });
-
-        jq("#worklist-phrase").on("keyup", function () {
-            var searchPhrase = jq(this).val();
-            radiologyWorklistDataTable.search(searchPhrase).draw();
-        });
-
-        jq("#print-worklist").on("click", function () {
-            jq.getJSON('${ui.actionLink("radiologyapp", "worklist", "getWorksheet")}',
-                    {
-                        "date": moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
-                        "phrase": jq("#worklist-phrase").val(),
-                        "investigation": jq("#worklist-investigation").val()
-                    }
-            ).success(function (data) {
-                        worksheet.items.removeAll();
-                        jq.each(data, function (index, item) {
-                            worksheet.items.push(item);
-                        });
-                        printData();
-                    });
-        });
+        printData();
+      });
+    });
 
 
 
 
 
-        function WorklistData() {
-            self = this;
-            self.worklistItems = ko.observableArray([]);
+    function WorklistData() {
+      self = this;
+      self.worklistItems = ko.observableArray([]);
+    }
+
+    reorderDialog = emr.setupConfirmationDialog({
+      dialogOpts: {
+        overlayClose: false,
+        close: true
+      },
+      selector: '#reorder-form',
+      actions: {
+        confirm: function () {
+          saveSchedule();
+          reorderDialog.close();
+        },
+        cancel: function () {
+          reorderDialog.close();
         }
-
-        reorderDialog = emr.setupConfirmationDialog({
-            dialogOpts: {
-                overlayClose: false,
-                close: true
-            },
-            selector: '#reorder-form',
-            actions: {
-                confirm: function () {
-                    saveSchedule();
-                    reorderDialog.close();
-                },
-                cancel: function () {
-                    reorderDialog.close();
-                }
-            }
-        });
-        resultsDialog = emr.setupConfirmationDialog({
-            dialogOpts: {
-                overlayClose: false,
-                close: true
-            },
-            selector: '#results-form',
-            actions: {
-                confirm: function () {
-                    saveXrayResults();//save xray results
-                    if (!errorStatus) {
-                        resultsDialog.close();
-                    }
-                },
-                cancel: function () {
-                    resultsDialog.close();
-                }
-            }
-        });
-
-        jq("#filmSelect").on('change', function () {
-            if (jq(this).val() !== "RADIOLOGY XRAY DEFAULT FORM FILM GIVEN") {
-                jq("#filmSize").prop('disabled', 'disabled');
-            } else {
-                jq("#filmSize").prop('disabled', false);
-            }
-        })
-
-
-        reorderForm = jq("#reorder-form").find("form").on("submit", function (event) {
-            event.preventDefault();
-            saveSchedule();
-        });
-
-
-        jq("#export-results-worklist").on("click", function () {
-            var downloadLink =
-                    emr.pageLink("radiologyapp", "reportExport",
-                            {
-                                "worklistDate": moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
-                                "phrase": jq("#worklist-phrase").val(),
-                                "investigation": jq("#worklist-investigation").val()
-                            }
-                    );
-            var win = window.open(downloadLink, '_blank');
-            if (win) {
-                //Browser has allowed it to be opened
-                win.focus();
-            } else {
-                //Broswer has blocked it
-                alert('Please allow popups for this site');
-            }
-        });
-        var worksheet = {items: ko.observableArray([])};
-
-
-        ko.applyBindings(scanDetails, jq("#reorder-form")[0]);
-        ko.applyBindings(resultDetails, jq("#results-form")[0]);
-        ko.applyBindings(worklistData, jq("#radiology-worklist")[0]);
-        ko.applyBindings(worksheet, jq("#worksheet")[0]);
-    });//End of Document Ready
-
-    function printData() {
-        jq("#worksheet").print({
-            globalStyles: false,
-            mediaPrint: false,
-            stylesheet: '${ui.resourceLink("referenceapplication","styles/referenceapplication.css")}',
-            iframe: true
-        });
-    }
-
-    //To handle success cases on posting results
-    function showSuccessResponse(responseText, statusText) {
-        location.reload();
-    }
-
-    //To handle error cases on posting results
-    function showErrorResponse(responseText, statusText) {
-        console.log(responseText);
-        console.log(statusText);
-    }
-
-
-    function getWorklistData(showNotification) {
-        if (typeof showNotification == 'undefined') {
-            showNotification = true;
+      }
+    });
+    resultsDialog = emr.setupConfirmationDialog({
+      dialogOpts: {
+        overlayClose: false,
+        close: true
+      },
+      selector: '#results-form',
+      actions: {
+        confirm: function () {
+          saveXrayResults();//save xray results
+          if (!errorStatus) {
+            resultsDialog.close();
+          }
+        },
+        cancel: function () {
+          resultsDialog.close();
         }
+      }
+    });
 
-        var orderedDate = jq("#worklist-order-date-field").val();
-        var phrase = jq("#worklist-phrase").val();
-        var investigation = jq("#worklist-investigation").val();
-        jq.getJSON('${ui.actionLink("radiologyapp", "worklist", "searchWorkList")}', {
-            "orderedDate": moment(orderedDate).format('DD/MM/YYYY'),
-            "phrase": phrase,
-            "investigation": investigation,
-        }).success(function (worklist) {
-            destroyWorklistDataTable();
+    jq("#filmSelect").on('change', function () {
+      if (jq(this).val() !== "RADIOLOGY XRAY DEFAULT FORM FILM GIVEN") {
+        jq("#filmSize").prop('disabled', 'disabled');
+      } else {
+        jq("#filmSize").prop('disabled', false);
+      }
+    })
 
-            if (worklist.data.length === 0) {
-                if (showNotification) {
-                    jq().toastmessage('showNoticeToast', "No match found!");
-                }
-                worklistData.worklistItems([]);
-            } else {
-                worklistData.worklistItems(worklist.data);
-            }
 
-            initializeWorklistDataTable(jq('#worklist-phrase').val());
-        });
+    reorderForm = jq("#reorder-form").find("form").on("submit", function (event) {
+      event.preventDefault();
+      saveSchedule();
+    });
+
+
+    jq("#export-results-worklist").on("click", function () {
+      var downloadLink =
+          emr.pageLink("radiologyapp", "reportExport",
+              {
+                "worklistDate": moment(jq('#worklist-order-date-field').val()).format('DD/MM/YYYY'),
+                "phrase": jq("#worklist-phrase").val(),
+                "investigation": jq("#worklist-investigation").val()
+              }
+          );
+      var win = window.open(downloadLink, '_blank');
+      if (win) {
+        //Browser has allowed it to be opened
+        win.focus();
+      } else {
+        //Broswer has blocked it
+        alert('Please allow popups for this site');
+      }
+    });
+    var worksheet = {items: ko.observableArray([])};
+
+
+    ko.applyBindings(scanDetails, jq("#reorder-form")[0]);
+    ko.applyBindings(resultDetails, jq("#results-form")[0]);
+    ko.applyBindings(worklistData, jq("#radiology-worklist")[0]);
+    ko.applyBindings(worksheet, jq("#worksheet")[0]);
+  });//End of Document Ready
+
+  function printData() {
+    jq("#worksheet").print({
+      globalStyles: false,
+      mediaPrint: false,
+      stylesheet: '${ui.resourceLink("referenceapplication","styles/referenceapplication.css")}',
+      iframe: true
+    });
+  }
+
+  //To handle success cases on posting results
+  function showSuccessResponse(responseText, statusText) {
+    location.reload();
+  }
+
+  //To handle error cases on posting results
+  function showErrorResponse(responseText, statusText) {
+    console.log(responseText);
+    console.log(statusText);
+  }
+
+
+  function getWorklistData(showNotification) {
+    if (typeof showNotification == 'undefined') {
+      showNotification = true;
     }
 
-    function initializeWorklistDataTable(phrase) {
-        if (typeof phrase == 'undefined') {
-            phrase = '';
+    var orderedDate = jq("#worklist-order-date-field").val();
+    var phrase = jq("#worklist-phrase").val();
+    var investigation = jq("#worklist-investigation").val();
+    jq.getJSON('${ui.actionLink("radiologyapp", "worklist", "searchWorkList")}', {
+      "orderedDate": moment(orderedDate).format('DD/MM/YYYY'),
+      "phrase": phrase,
+      "investigation": investigation,
+    }).success(function (worklist) {
+      destroyWorklistDataTable();
+
+      if (worklist.data.length === 0) {
+        if (showNotification) {
+          jq().toastmessage('showNoticeToast', "No match found!");
         }
+        worklistData.worklistItems([]);
+      } else {
+        worklistData.worklistItems(worklist.data);
+      }
 
-        radiologyWorklistDataTable = radiologyWorklistTable.DataTable({
-            responsive: true,
-            searching: true,
-            lengthChange: false,
-            pageLength: 15,
-            jQueryUI: true,
-            pagingType: 'full_numbers',
-            sort: false,
-            dom: 't<"fg-toolbar ui-toolbar ui-corner-bl ui-corner-br ui-helper-clearfix datatables-info-and-pg"ip>',
-            language: {
-                zeroRecords: 'No tests in worklist.',
-                paginate: {
-                    first: 'First',
-                    previous: 'Previous',
-                    next: 'Next',
-                    last: 'Last'
-                }
-            }
-        }).search(phrase).draw();
+      initializeWorklistDataTable(jq('#worklist-phrase').val());
+    });
+  }
+
+  function initializeWorklistDataTable(phrase) {
+    if (typeof phrase == 'undefined') {
+      phrase = '';
     }
 
-    function destroyWorklistDataTable() {
-        radiologyWorklistDataTable.clear();
-        radiologyWorklistDataTable.destroy();
-    }
-    function showResultForm(testDetail) {
-        resultDetails.details(testDetail);
-        orderIdd = testDetail.orderId;
-        testId = testDetail.testId;
-        isXray = testDetail.xray;
-        jq("#testId").val(testId);
-        jq("#isXray").val(isXray);
-        resultsDialog.show();
-    }
-
-    function reorder(orderId) {
-        jq("#reorder-form #order").val(orderId);
-        orderIdd = orderId;
-        var details = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-            return item.orderId == orderId;
-        });
-        scanDetails.details(details);
-        reorderDialog.show();
-    }
-
-    function saveSchedule() {
-        jq.post('${ui.actionLink("radiologyapp", "queue", "rescheduleOrder")}',
-                {"orderId": orderIdd, "rescheduledDate": moment(jq("#reorder-date-field").val()).format('DD/MM/YYYY')},
-                function (data) {
-                    if (data.status === "fail") {
-                        jq().toastmessage('showErrorToast', data.error);
-                    } else {
-                        jq().toastmessage('showSuccessToast', data.message);
-                        var reorderedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
-                            return item.orderId == orderIdd;
-                        });
-                        worklistData.worklistItems.remove(reorderedTest);
-                    }
-                },
-                'json'
-        );
-    }
-
-    function saveXrayResults() {
-        if (jq("#filmSelect").val() == "0") {
-            jq().toastmessage('showErrorToast', "Specify Film Given Status!");
-            errorStatus = true;
-        } else if (jq.trim(jq("#note").val()) <= 0) {
-            jq().toastmessage('showErrorToast', "Results Note is Mandatory!");
-            errorStatus = true;
-        } else {
-            errorStatus = false;
+    radiologyWorklistDataTable = radiologyWorklistTable.DataTable({
+      responsive: true,
+      searching: true,
+      lengthChange: false,
+      pageLength: 15,
+      jQueryUI: true,
+      pagingType: 'full_numbers',
+      sort: false,
+      dom: 't<"fg-toolbar ui-toolbar ui-corner-bl ui-corner-br ui-helper-clearfix datatables-info-and-pg"ip>',
+      language: {
+        zeroRecords: 'No tests in worklist.',
+        paginate: {
+          first: 'First',
+          previous: 'Previous',
+          next: 'Next',
+          last: 'Last'
         }
+      }
+    }).search(phrase).draw();
+  }
+
+  function destroyWorklistDataTable() {
+    radiologyWorklistDataTable.clear();
+    radiologyWorklistDataTable.destroy();
+  }
+  function showResultForm(testDetail) {
+    resultDetails.details(testDetail);
+    orderIdd = testDetail.orderId;
+    testId = testDetail.testId;
+    isXray = testDetail.xray;
+    jq("#testId").val(testId);
+    jq("#isXray").val(isXray);
+    resultsDialog.show();
+  }
+
+  function reorder(orderId) {
+    jq("#reorder-form #order").val(orderId);
+    orderIdd = orderId;
+    var details = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+      return item.orderId == orderId;
+    });
+    scanDetails.details(details);
+    reorderDialog.show();
+  }
+
+  function saveSchedule() {
+    jq.post('${ui.actionLink("radiologyapp", "queue", "rescheduleOrder")}',
+        {"orderId": orderIdd, "rescheduledDate": moment(jq("#reorder-date-field").val()).format('DD/MM/YYYY')},
+        function (data) {
+          if (data.status === "fail") {
+            jq().toastmessage('showErrorToast', data.error);
+          } else {
+            jq().toastmessage('showSuccessToast', data.message);
+            var reorderedTest = ko.utils.arrayFirst(worklistData.worklistItems(), function (item) {
+              return item.orderId == orderIdd;
+            });
+            worklistData.worklistItems.remove(reorderedTest);
+          }
+        },
+        'json'
+    );
+  }
+
+  function saveXrayResults() {
+    if (jq("#filmSelect").val() == "0") {
+      jq().toastmessage('showErrorToast', "Specify Film Given Status!");
+      errorStatus = true;
+    } else if (jq.trim(jq("#note").val()) <= 0) {
+      jq().toastmessage('showErrorToast', "Results Note is Mandatory!");
+      errorStatus = true;
+    } else {
+      errorStatus = false;
+    }
 
 
-        if (errorStatus) {
-            return false;
-        } else {
-            jq('input[type=file]').change();
-            jq("#resultsForm").submit();
+    if (errorStatus) {
+      return false;
+    } else {
+      jq('input[type=file]').change();
+      jq("#resultsForm").submit();
 
-
-        }
 
     }
+
+  }
 
 
 
@@ -435,27 +435,9 @@
 
             <div class="dialog-data">Scan Note</div>
 
-            <div class="inline"><input id="note" name="RADIOLOGY XRAY DEFAULT FORM NOTE" placeholder="Enter Scan Notes"
-                                       required/></div>
+            <div class="inline"><textarea id="note" name="RADIOLOGY XRAY DEFAULT FORM NOTE" placeholder="Enter Scan Notes"
+                                          rows="5" cols="20" required></textarea></div>
         </p>
-
-
-            <p>
-
-            <div class="dialog-data">Film Size:</div>
-
-            <div class="inline">
-                <select id="filmSize" name="RADIOLOGY XRAY FILM SIZE TYPE">
-                    <option value="RADIOLOGY XRAY FILM SIZENA" selected>N/A</option>
-                    <option value="RADIOLOGY XRAY FILM SIZE1">8*10</option>
-                    <option value="RADIOLOGY XRAY FILM SIZE2">10*12</option>
-                    <option value="RADIOLOGY XRAY FILM SIZE3">12*15</option>
-
-                </select>
-
-            </div>
-        </p>
-
             <p>
 
             <div class="dialog-data">File Upload</div>
@@ -530,10 +512,10 @@
 <!-- Worksheet -->
 <style>
 .margin-left {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 
 #worksheet {
-    display: none;
+  display: none;
 }
 </style>
