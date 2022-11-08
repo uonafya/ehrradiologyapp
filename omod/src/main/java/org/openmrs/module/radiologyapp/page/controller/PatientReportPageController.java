@@ -56,6 +56,8 @@ public class PatientReportPageController {
         HospitalCoreService hcs = Context.getService(HospitalCoreService.class);
 
         model.addAttribute("patient", patient);
+        model.addAttribute("patientFamilyName", patient.getFamilyName());
+        model.addAttribute("patientGivenName", patient.getGivenName());
         model.addAttribute("radiologyTest", radiologyTest.getConcept().getName().getName());
         model.addAttribute("patientIdentifier", patient.getPatientIdentifier());
         model.addAttribute("age", patient.getAge());

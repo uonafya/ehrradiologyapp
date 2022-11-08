@@ -3,8 +3,7 @@
 
     ui.includeJavascript("ehrconfigs", "paging.js")
     ui.includeJavascript("ehrconfigs", "moment.js")
-    ui.includeJavascript("radiologyapp", "common.js")
-    ui.includeJavascript("ehrconfigs", "jquery.PrintArea.js")
+    ui.includeJavascript("radiologyapp", "jq.print.js")
     ui.includeJavascript("ehrconfigs", "knockout-3.4.0.js")
     ui.includeJavascript("ehrconfigs", "jquery-ui-1.9.2.custom.min.js")
     ui.includeJavascript("ehrconfigs", "underscore-min.js")
@@ -37,17 +36,12 @@
 
     jq(document).ready(function () {
         jq(".dashboard-tabs").tabs();
-        jq('#surname').html('${patient.names.familyName}' + ',<em>surname</em>');
-        jq('#othname').html('${patient.names.givenName}' + ' &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <em>other names</em>');
+        jq('#surname').html('${patientFamilyName}' + ',<em>surname</em>');
+        jq('#othname').html('${patientGivenName}' + ' &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <em>other names</em>');
         jq('#agename').html('${patient.age} years (' + moment('${patient.birthdate}').format('DD,MMM YYYY') + ')');
         jq('.tad').text('Last Visit: ' + moment('${previousVisit}').format('DD.MM.YYYY hh:mm') + ' HRS');
         jq("#radImage").hide();
-
-        /*jq.get('
-        ${ui.actionLink("radiologyapp", "radiationResults", "loadDicomImage")}', function (data) {
-         alert("Data Loaded: " + data);
-         });*/
-    });//end of doc ready
+    });
 
     function getDicom(fileName) {
         jq.ajax({
@@ -215,7 +209,7 @@
             <thead>
             <tr>
                 <th>Test</th>
-                <th>Note</th>
+                <th>Notes</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -228,11 +222,11 @@
                 <td align="center">${_1000171}</td>
                 <td align="center">
                     <a title="View Image"
-                       onclick="javascript:loadRadiologyImage()"><i
+                       onclick="loadRadiologyImage()"><i
                             class="icon-picture small"></i></a>
 
                     <a title="Print Report"
-                       onclick="javascript:printPatientReport()"><i
+                       onclick="printPatientReport()"><i
                             class="icon-print small"></i></a>
 
                 </td>
@@ -248,7 +242,7 @@
 </div>
 
 
-<div class="container">
+<div class="container" style="display: none">
     <div id="loadProgress">Image Load Progress:</div>
     <input type="checkbox" id="toggleModalityLUT">Apply Modality LUT</input>
     <input type="checkbox" id="toggleVOILUT">Apply VOI LUT</input>
