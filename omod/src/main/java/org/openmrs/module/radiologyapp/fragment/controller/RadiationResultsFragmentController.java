@@ -167,7 +167,6 @@ public class RadiationResultsFragmentController {
             type = "Given";
         }
 
-        System.out.println("Test this ID " + testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
 
         Encounter enc = Context.getEncounterService().getEncounter(Integer.parseInt(encounterId));
@@ -212,7 +211,6 @@ public class RadiationResultsFragmentController {
                         }
                     }
                 } else {
-                    System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
                     log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
                 }
 

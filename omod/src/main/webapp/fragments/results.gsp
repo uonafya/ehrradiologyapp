@@ -310,34 +310,10 @@
 
             <div class="dialog-data">Scan Note</div>
 
-            <div class="inline"><input id="editNote" name="RADIOLOGY XRAY DEFAULT FORM NOTE"
-                                       placeholder="Enter Scan Notes"
-                                       required/></div>
-        </p>
-
-
-            <p>
-
-            <div class="dialog-data">Film Size:</div>
-
             <div class="inline">
-                <select id="editFilmSize" name="RADIOLOGY XRAY FILM SIZE TYPE">
-                    <option value="RADIOLOGY XRAY FILM SIZENA" selected>N/A</option>
-                    <option value="RADIOLOGY XRAY FILM SIZE1">8*10</option>
-                    <option value="RADIOLOGY XRAY FILM SIZE2">10*12</option>
-                    <option value="RADIOLOGY XRAY FILM SIZE3">12*15</option>
-
-                </select>
-
-            </div>
-        </p>
-
-            <p>
-
-            <div class="dialog-data">File Upload</div>
-
-            <div class="inline">
-                <input size="30" type="file" name="editedFile" id="editedFile"/><br/>
+                <textarea id="editNote" name="RADIOLOGY XRAY DEFAULT FORM NOTE"
+                                       placeholder="Enter Scan Notes" cols="50" rows="5"
+                          required> </textarea>
             </div>
         </p>
 
