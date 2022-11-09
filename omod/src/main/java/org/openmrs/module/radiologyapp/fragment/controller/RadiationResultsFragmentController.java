@@ -71,11 +71,7 @@ public class RadiationResultsFragmentController {
         if (!isXray) {
             type = "Given";
         }
-
-        System.out.println("Test this ID " + testId);
         RadiologyTest test = rs.getRadiologyTestById(Integer.parseInt(testId));
-        //String encounterTypeStr = GlobalPropertyUtil.getString(BillingConstants.GLOBAL_PROPRETY_RADIOLOGY_ENCOUNTER_TYPE, "RADIOLOGYENCOUNTER");
-        //String imageConceptStr = GlobalPropertyUtil.getString(RadiologyConstants.PROPRETY_RADIOLOGY_IMAGE_CONCEPT, "ec58b921-03cd-486d-89e7-71b1b0db5f31");
         EncounterType encounterType = Context.getEncounterService().getEncounterTypeByUuid("012bb9f4-f282-11ea-a6d6-3b4fa4aefb5a");
         Encounter enc = new Encounter();
         enc.setCreator(Context.getAuthenticatedUser());
@@ -140,7 +136,6 @@ public class RadiationResultsFragmentController {
                         }
                     }
                 } else {
-                    System.out.println("Failed to upload " + file.getOriginalFilename() + " because it was empty");
                     log.info("message", "Failed to upload " + file.getOriginalFilename() + " because it was empty");
                 }
 
@@ -149,11 +144,9 @@ public class RadiationResultsFragmentController {
                 test.setEncounter(enc);
                 test = rs.saveRadiologyTest(test);
                 rs.completeTest(test);
-
-                this.sendPatientToOpdQueue(enc);
-
             }
-
+            System.out.println("We are about to sent this back to OPD");
+            sendPatientToOpdQueue(enc);
             completeStatus = rs.completeTest(test);
             return SimpleObject.create("status", "success", "message", "Xray Results Saved Successfully", "completeStatus", completeStatus);
         }
@@ -332,7 +325,6 @@ public class RadiationResultsFragmentController {
                 obs.setOrder(test.getOrder());
                 obs.setComplexData(complexData);
             } else {
-                System.out.println("The file name:" + title + "does not exist!");
                 f.close();
             }
 

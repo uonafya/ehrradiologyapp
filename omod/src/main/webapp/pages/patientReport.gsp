@@ -33,7 +33,7 @@
 <script>
     var results = {'items': ko.observableArray([])};
     var initialResults = [];
-
+    jQuery.noConflict();
     jq(document).ready(function () {
         jq(".dashboard-tabs").tabs();
         jq('#surname').html('${patientFamilyName}' + ',<em>surname</em>');
@@ -136,7 +136,6 @@
     margin: 35px 10px 0 0;
 }
 </style>
-
 <body>
 <div class="clear"></div>
 
