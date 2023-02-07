@@ -76,7 +76,7 @@ public class QueueFragmentController {
 
             for (TestModel testModel : allTestOrders) {
                 //1.pick investigations accepted but pending results input 2. Also Pick those not yet accepted [ need to find out if there is need to show rejected investigations in this queue]
-                if (testModel.getStatus() == null || testModel.getStatus().isEmpty() || testModel.getStatus().equals(RadiologyConstants.TEST_STATUS_ACCEPTED)) {
+                if (testModel.getStatus() == null || testModel.getStatus().isEmpty()) {
                     tests.add(testModel);
                 }
             }
