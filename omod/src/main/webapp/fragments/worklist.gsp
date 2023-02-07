@@ -436,15 +436,8 @@
             <div class="dialog-data">Scan Note</div>
 
             <div class="inline"><textarea id="note" name="RADIOLOGY XRAY DEFAULT FORM NOTE" placeholder="Enter Scan Notes"
-                                          rows="5" cols="20" required></textarea></div>
+                                          rows="10" cols="30" required></textarea></div>
         </p>
-            <p>
-
-            <div class="dialog-data">File Upload</div>
-
-            <div class="inline">
-                <input size="30" type="file" name="file" id="file"/><br/>
-            </div>
         </p>
 
 

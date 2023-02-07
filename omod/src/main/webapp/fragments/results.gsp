@@ -312,7 +312,7 @@
 
             <div class="inline">
                 <textarea id="editNote" name="RADIOLOGY XRAY DEFAULT FORM NOTE"
-                                       placeholder="Enter Scan Notes" cols="50" rows="5"
+                                       placeholder="Enter Scan Notes" cols="30" rows="10"
                           required> </textarea>
             </div>
         </p>
