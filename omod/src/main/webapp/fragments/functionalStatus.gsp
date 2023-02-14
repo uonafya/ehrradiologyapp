@@ -89,7 +89,6 @@
                 dataTable.draw();
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr);
                 jQuery("#ajaxLoader").hide();
             }
         });

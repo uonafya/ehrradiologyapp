@@ -127,7 +127,6 @@
         win.focus();
       } else {
         //Broswer has blocked it
-        alert('Please allow popups for this site');
       }
     });
     var worksheet = {items: ko.observableArray([])};
